@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: ./backend
+    container_name: graysons-backend
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./backend:/backend
+
+  frontend:
+    build: ./frontend
+    container_name: graysons-frontend
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend:/frontend
