@@ -6,6 +6,8 @@ services:
     tty: true
     volumes:
       - ./backend:/backend
+    ports:
+      - "8000:8000"
 
   frontend:
     build: ./frontend
