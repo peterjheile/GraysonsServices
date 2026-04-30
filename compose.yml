@@ -8,6 +8,7 @@ services:
       - ./backend:/backend
     ports:
       - "8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
 
   frontend:
     build: ./frontend
@@ -16,3 +17,10 @@ services:
     tty: true
     volumes:
       - ./frontend:/frontend
+      - /frontend/node_modules
+      - /frontend/.next
+    ports:
+      - "3000:3000"
+    environment:
+      - WATCHPACK_POLLING=true
+    command: npm run dev -- --webpack --hostname 0.0.0.0 --port 3000
