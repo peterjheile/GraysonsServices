@@ -1,9 +1,14 @@
 import Image from "next/image";
 
+import { HeroSection } from "@/components/home/HeroSection"
+
 export default function Home() {
   return (
-    <div className = "bg-red-500">
-      Okay, this could be reafdasdfjkfhfdasfdf
+    <div className = "relative w-screen min-w-[320px]">
+
+      <HeroSection/>
+
+
     </div>
   );
 }
