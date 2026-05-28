@@ -1,14 +1,24 @@
-import Image from "next/image";
-
-import { HeroSection } from "@/components/home/HeroSection"
-
+import Header from "@/components/layout/Header"
+import Hero from '@/components/pages/home/Hero'
+import MarqueeStrip from '@/components/pages/home/MarqueeStrip';
+import About from '@/components/pages/home/About';
+import Gallery from '@/components/pages/home/Gallery';
+import Testimonials from '@/components//pages/home/Testimonials';
+import Contact from '@/components/pages/home/Contact';
+import Footer from '@/components/layout/Footer';
+ 
 export default function Home() {
   return (
-    <div className = "relative w-screen min-w-[320px]">
-
-      <HeroSection/>
-
-
-    </div>
+    <main className="grain">
+      <Header />
+      <Hero />
+      <MarqueeStrip />
+      <About />
+      <Gallery />
+      <Testimonials />
+      <Contact />
+      <Footer />
+    </main>
   );
 }
+ 

@@ -1,53 +1,34 @@
-import type { Metadata } from "next";
-
-import { Header } from "@/components/layout/Header"
-import { Footer } from "@/components/layout/Footer"
-
-import { Geist, Geist_Mono, Reenie_Beanie } from "next/font/google";
-import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const reenieBeanie = Reenie_Beanie({
-  variable: "--font-reenie-beanie",
-  subsets: ["latin"],
-  weight: "400",
-});
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Graysons Services",
-  description: "Graysons Services Website",
+  title: "Grayson's Services | Premium Hardscaping",
+  description:
+    "Expert hardscaping in the Greater Ohio Region. Stone patios, retaining walls, outdoor kitchens, driveways and more — crafted to last a lifetime.",
+  keywords: ['hardscaping', 'stone patio', 'retaining wall', 'outdoor kitchen', 'Ohio'],
+  openGraph: {
+    title: "Grayson's Services | Premium Hardscaping",
+    description: 'Crafting outdoor spaces that last — for homeowners and developers who demand the best.',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${reenieBeanie.variable} h-full antialiased`}
-    >
-
-      <body className="flex flex-col">
-        <Header/>
-        
-        <main>
-          {children}
-        </main>
-
-        <Footer/>
-      </body>
-
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }
