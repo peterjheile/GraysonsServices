@@ -26,7 +26,7 @@ export default function CultureSection() {
         <div
           className="reveal-left relative min-h-[420px] lg:min-h-full overflow-hidden"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80')`,
+            backgroundImage: `url('/HomeHero.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center 55%',
           }}
@@ -35,7 +35,7 @@ export default function CultureSection() {
           {/* Corner label */}
           <div className="absolute bottom-8 left-8 bg-[#1a1714]/80 backdrop-blur-sm px-5 py-4">
             <div className="text-[10px] tracking-[0.3em] uppercase text-[#b8975a] font-medium">The Grayson's Way</div>
-            <div className="font-['Cormorant_Garamond'] text-2xl text-[#faf8f5] mt-1">Craft over shortcuts.</div>
+            <div className="font-['Cormorant_Garamond'] text-2xl text-[#faf8f5] mt-1">Something Here.</div>
           </div>
         </div>
 
@@ -47,27 +47,27 @@ export default function CultureSection() {
           </div>
 
           <h2 className="font-['Cormorant_Garamond'] text-[clamp(34px,4vw,54px)] font-light text-[#1a1714] leading-[1.1] mb-8">
-            A Company That's<br />
-            <em className="italic text-[#b8975a]">Growing on Purpose</em>
+            A snazzy Title<br />
+            <em className="italic text-[#b8975a]">Will go Here</em>
           </h2>
 
           <div className="space-y-5 text-[#5c5550] text-sm font-light leading-relaxed max-w-lg">
             <p>
-              Grayson's Services isn't a big company pretending to be small, or a small company trying to punch above its weight. We're a focused, 42-person team that's been systematically building the infrastructure — the talent, the systems, the reputation — to scale to the next level.
+              There will be three paragraphs here (or less). This first will talk about the company and what its initial values are (essentially what is expected of anyone applying to work here)
             </p>
             <p>
-              That means the people who join us now grow with us. The crew lead who comes in today becomes the foreman when we open our next division. The project manager who brings discipline to our operations becomes the director of ops when we expand our footprint.
+              This paragraph will talk about how this will effect the people that will work here. How they will grow, learn, lead, ect.
             </p>
             <p>
-              We value people who take ownership. Who clean up before they're asked to. Who flag a problem before it becomes a crisis. Who treat a client's property like it's their own. That's who we hire — and that's who we promote.
+              Hard things that the company values in employees paragraph. Such as We value people who are proactive, who clean flag problems, who are willing to clean up, etc - and then a final send off such as "thats who we promote."
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-6 mt-12 pt-10 border-t border-[#e8e2da]">
             {[
-              { label: 'Founded', value: '2009' },
-              { label: 'Avg. Tenure', value: '4.2 yrs' },
-              { label: 'Promoted Internal', value: '78%' },
+              { label: 'Founded', value: 'xxx' },
+              { label: 'Avg. Tenure', value: 'xxx' },
+              { label: 'Promoted Internal', value: 'xxx' },
             ].map((s) => (
               <div key={s.label}>
                 <div className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#b8975a]">{s.value}</div>
@@ -78,8 +78,8 @@ export default function CultureSection() {
         </div>
       </div>
 
-      {/* ── Part 2: Team voice cards ── */}
-      <div className="bg-[#1a1714] py-24 lg:py-32">
+
+      <div className="bg-[#1a1714] py-24 lg:py-32 hidden">
         <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
 
           <div className="text-center mb-16 reveal">
@@ -137,10 +137,10 @@ export default function CultureSection() {
       {/* ── Part 3: Photo grid strip ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 h-56 lg:h-72 reveal">
         {[
-          'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=600&q=75',
-          'https://images.unsplash.com/photo-1591588582259-e675bd2e6088?w=600&q=75',
-          'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=75',
-          'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=600&q=75',
+          'services/d8.jpg',
+          'services/RetainingWall1.jpg',
+          'services/retainingWall2.jpg',
+          'services/Walkway1.jpg',
         ].map((src, i) => (
           <div
             key={i}

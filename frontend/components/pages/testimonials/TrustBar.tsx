@@ -4,26 +4,26 @@ import { useEffect, useRef, useState } from 'react';
 
 const metrics = [
   {
-    value: 191,
+    value: 0,
     suffix: '+',
     label: 'Verified Reviews',
-    sub: 'Across Google, Houzz & Facebook',
+    sub: 'Across Google & Facebook',
   },
   {
-    value: 4.9,
+    value: 0,
     suffix: '',
     label: 'Average Star Rating',
     sub: 'Out of 5.0 across all platforms',
     decimal: true,
   },
   {
-    value: 98,
+    value: 100,
     suffix: '%',
     label: 'Would Re-hire',
     sub: 'Based on post-project surveys',
   },
   {
-    value: 500,
+    value: 0,
     suffix: '+',
     label: 'Projects Completed',
     sub: 'Since 2009',
@@ -112,7 +112,7 @@ export default function TrustBar() {
         <div className="mt-16 pt-10 border-t border-[#2d2926] grid sm:grid-cols-3 gap-6 reveal">
           {[
             { icon: '✦', label: 'Free Estimates', detail: 'No cost, no obligation — ever' },
-            { icon: '✦', label: '5-Year Warranty', detail: 'On all hardscaping installations' },
+            { icon: '✦', label: 'Gauntee of Some Sort', detail: 'On all hardscaping installations' },
             { icon: '✦', label: '48-Hour Response', detail: 'We follow up on every inquiry' },
           ].map((g) => (
             <div key={g.label} className="flex items-start gap-4">

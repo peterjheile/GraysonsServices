@@ -329,7 +329,7 @@ export default function JobBoard() {
               Don't See the Right Fit?
             </div>
             <p className="text-sm text-[#5c5550] font-light leading-relaxed max-w-xl">
-              We're growing quickly and occasionally hire for roles before we post them. If you're exceptional at what you do and believe in the craft, send us your details — we keep every inquiry on file.
+              Short description and then mention that they should still reach out, all inquiries are kept on record.
             </p>
           </div>
           <a

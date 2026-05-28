@@ -21,7 +21,7 @@ export default function CareersPage() {
       <CareersHero />
       <CultureSection />
       <PerksGrid />
-      <GrowthPath />
+      {/* <GrowthPath /> */}
       <JobBoard />
       <CareersCTA />
       <Footer />

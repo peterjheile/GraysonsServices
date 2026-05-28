@@ -19,10 +19,10 @@ function useCountUp(target: number, duration = 1600, active = false) {
 }
 
 const stats = [
-  { value: 15, suffix: '+', label: 'Years in Business' },
-  { value: 42,  suffix: '',  label: 'Team Members' },
-  { value: 94,  suffix: '%', label: 'Retention Rate' },
-  { value: 8, suffix: '',  label: 'Open Positions' },
+  { value: 0, suffix: '+', label: 'Years in Business' },
+  { value: 0,  suffix: '',  label: 'Team Members' },
+  { value: 0,  suffix: '%', label: 'Retention Rate' },
+  { value: 2, suffix: '',  label: 'Open Positions' },
 ];
 
 export default function CareersHero() {
@@ -56,7 +56,7 @@ export default function CareersHero() {
   const counts = [s0, s1, s2, s3];
 
   return (
-    <section className="relative min-h-screen flex flex-col lg:flex-row bg-[#1a1714] overflow-hidden">
+    <section className="relative max-h-[1000px] flex flex-col lg:flex-row bg-[#1a1714] overflow-hidden">
 
       {/* ── LEFT: Editorial copy panel ── */}
       <div className="relative z-10 flex flex-col justify-between w-full lg:w-[52%] px-6 lg:px-16 xl:px-20 pt-40 pb-16 lg:pb-20">
@@ -110,7 +110,7 @@ export default function CareersHero() {
             className="text-[#a39890] text-base lg:text-lg font-light leading-relaxed max-w-md mb-10"
             style={{ animation: 'hero-word-in 1s 0.8s both' }}
           >
-            Grayson's Services is a hardscaping company on the rise. We're looking for the kind of people who take pride in physical craft — who want to leave work every day and see exactly what they built.
+            A description about Grayson services and what it means for someone looking to work there.
           </p>
 
           <div
@@ -152,7 +152,7 @@ export default function CareersHero() {
           ref={imgRef}
           className="absolute inset-0 -top-[12%] -bottom-[12%]"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=85')`,
+            backgroundImage: `url('/services/Deck2.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center 40%',
           }}
@@ -165,7 +165,7 @@ export default function CareersHero() {
           <span className="text-[9px] tracking-[0.3em] uppercase text-[#b8975a] font-medium text-center leading-tight">Now</span>
           <span className="font-['Cormorant_Garamond'] text-3xl lg:text-4xl text-[#faf8f5] font-light leading-none my-1">Hiring</span>
           <div className="w-6 h-px bg-[#b8975a] mt-1" />
-          <span className="text-[9px] tracking-[0.2em] uppercase text-[#b8975a] font-medium mt-1">8 Roles</span>
+          <span className="text-[9px] tracking-[0.2em] uppercase text-[#b8975a] font-medium mt-1">2 Roles</span>
         </div>
 
         {/* Bottom image caption */}

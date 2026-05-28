@@ -19,18 +19,6 @@ const platforms = [
     ),
   },
   {
-    name: 'Houzz',
-    handle: 'GraysonsServices',
-    description: 'Review us on Houzz',
-    href: '#',
-    color: '#7BB242',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="#7BB242">
-        <path d="M12 2L2 8v14h8v-7h4v7h8V8L12 2z"/>
-      </svg>
-    ),
-  },
-  {
     name: 'Facebook',
     handle: 'GraysonsServicesOH',
     description: 'Rate on Facebook',
@@ -72,7 +60,7 @@ export default function LeaveReview() {
               <em className="italic text-[#b8975a]">We'd Love to Hear It.</em>
             </h2>
             <p className="text-[#5c5550] text-sm font-light leading-relaxed max-w-md mb-8">
-              Your honest review helps other homeowners make confident decisions — and helps us keep raising the standard of our work. It takes less than two minutes and means more than you know.
+              Something Like : Your honest review helps other homeowners make confident decisions -- maybe a little bit longer.
             </p>
             <div className="flex items-center gap-4 py-5 px-6 bg-white border border-[#e8e2da] max-w-sm">
               <div>

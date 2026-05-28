@@ -20,7 +20,7 @@ export default function CareersCTA() {
       <div
         className="absolute top-0 right-0 bottom-0 w-1/2 hidden lg:block"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=1000&q=80')`,
+          backgroundImage: `url('/services/Driveway1.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -42,7 +42,7 @@ export default function CareersCTA() {
             </h2>
 
             <p className="text-[#5c5550] text-base font-light leading-relaxed max-w-md mb-10">
-              We're a company that's growing with intention — and every person we bring on shapes what we become. If you take pride in your work and want to be somewhere that notices, we want to hear from you.
+              A Final CTA goes here with a short description and a little inpiration.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-12">

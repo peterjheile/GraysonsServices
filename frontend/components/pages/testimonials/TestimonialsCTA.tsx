@@ -82,7 +82,7 @@ export default function TestimonialsCTA() {
               </div>
 
               <blockquote className="font-['Cormorant_Garamond'] text-[clamp(18px,2vw,26px)] font-light text-[#faf8f5] italic leading-[1.55] mb-8">
-                "From the consultation to the final walkthrough, Grayson's made the process effortless. The fire pit area is the centerpiece of our summers now."
+                "From the consultation to the final walkthrough ... the rest of the review will go here. Good review, medium sized."
               </blockquote>
 
               <div className="flex items-center gap-3">
@@ -90,8 +90,8 @@ export default function TestimonialsCTA() {
                   <span className="font-['Cormorant_Garamond'] text-lg font-semibold text-[#b8975a]">JW</span>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-[#faf8f5]">James & Carol Whitmore</div>
-                  <div className="text-[11px] text-[#5c5550] mt-0.5">Homeowners · Oakmont, OH</div>
+                  <div className="text-sm font-medium text-[#faf8f5]">Client Names</div>
+                  <div className="text-[11px] text-[#5c5550] mt-0.5">Homeowners · Bloomington, IN</div>
                 </div>
               </div>
             </div>

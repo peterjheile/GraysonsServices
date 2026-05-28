@@ -22,7 +22,7 @@ export default function ContactHero() {
         ref={imgRef}
         className="absolute inset-0 -top-[15%] -bottom-[15%]"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1800&q=80')`,
+          backgroundImage: `url('/services/Retaining-Walls/w1.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center 35%',
         }}

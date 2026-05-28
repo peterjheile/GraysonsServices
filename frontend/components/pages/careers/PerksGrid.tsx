@@ -86,7 +86,7 @@ export default function PerksGrid() {
           </div>
           <div className="reveal">
             <p className="text-[#5c5550] text-sm font-light leading-relaxed max-w-md">
-              We built this benefits package by asking our own crew what actually matters to them — not what looks good on a hiring page. This is what came back.
+              We built this benefits package . . . A short description will go here essentiually to "hype up" the perks of joining the crew.
             </p>
           </div>
         </div>
@@ -118,26 +118,26 @@ export default function PerksGrid() {
         <div className="mt-16 bg-[#1a1714] p-8 lg:p-12 grid lg:grid-cols-3 gap-8 reveal">
           {[
             {
-              stat: '70%',
-              label: 'Health Premium Covered',
-              sub: 'Medical, dental & vision — Grayson\'s covers the majority',
+              stat: 'xxx',
+              label: 'A perk summary, or new perk here.',
+              sub: 'Short description of that perk.',
             },
             {
               stat: '100%',
               label: 'Training & Certs Paid',
-              sub: 'ICPI, OSHA, equipment licenses — all on us',
+              sub: 'Short training desc.',
             },
             {
               stat: '$0',
               label: 'Out-of-Pocket Tools',
-              sub: 'We supply every tool you need for the job, maintained and ready',
+              sub: 'We supply tools or something similar',
             },
           ].map((item) => (
             <div key={item.label} className="flex items-start gap-6">
               <div className="font-['Cormorant_Garamond'] text-5xl font-light text-[#b8975a] leading-none shrink-0">{item.stat}</div>
               <div>
                 <div className="text-sm font-semibold text-[#faf8f5] tracking-wide mb-1">{item.label}</div>
-                <div className="text-xs text-[#5c5550] font-light leading-relaxed">{item.sub}</div>
+                <div className="text-xs text-[#b9aca2] font-light leading-relaxed">{item.sub}</div>
               </div>
             </div>
           ))}

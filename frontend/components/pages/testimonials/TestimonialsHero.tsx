@@ -34,7 +34,7 @@ export default function TestimonialsHero() {
         ref={imgRef}
         className="absolute inset-0 -top-[15%] -bottom-[15%]"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?w=1800&q=80')`,
+          backgroundImage: `url('/services/Deck1.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center 40%',
         }}
@@ -53,8 +53,7 @@ export default function TestimonialsHero() {
         style={{ animation: 'hero-word-in 1s 1s both' }}
       >
         {[
-          { label: 'Google', rating: '4.9', count: '87 reviews' },
-          { label: 'Houzz', rating: '5.0', count: '63 reviews' },
+          { label: 'Google', rating: '5.0', count: 'xx reviews' },
         ].map((p) => (
           <div
             key={p.label}
@@ -106,7 +105,7 @@ export default function TestimonialsHero() {
           className="text-[#a39890] text-base lg:text-lg font-light max-w-lg leading-relaxed"
           style={{ animation: 'hero-word-in 1s 0.7s both' }}
         >
-          Over 500 completed projects. Over 190 verified reviews across Google, Houzz, and Facebook. Here's what our clients say — in their own words.
+          Over xxx completed projects. Short description about take it from our clients, here our there words, etc.
         </p>
       </div>
 
@@ -116,8 +115,8 @@ export default function TestimonialsHero() {
         style={{ animation: 'hero-word-in 1s 1.1s both' }}
       >
         {[
-          { value: '4.9★', label: 'Average Rating' },
-          { value: '191+', label: 'Verified Reviews' },
+          { value: '5.0★', label: 'Average Rating' },
+          { value: 'xxx+', label: 'Verified Reviews' },
           { value: '100%', label: 'Would Re-hire' },
         ].map((s) => (
           <div key={s.label} className="w-44 px-6 py-5 border-l border-t border-[#b8975a]/20 bg-[#1a1714]/70 backdrop-blur-sm">
