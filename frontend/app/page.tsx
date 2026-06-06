@@ -9,15 +9,15 @@ import Footer from '@/components/layout/Footer';
  
 export default function Home() {
   return (
-    <main className="grain">
+    <main className="grain h-500">
       <Header />
       <Hero />
-      <MarqueeStrip />
+      {/* <MarqueeStrip />
       <About />
       <Gallery />
       <Testimonials />
       <Contact />
-      <Footer />
+      <Footer /> */}
     </main>
   );
 }
