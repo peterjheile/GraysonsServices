@@ -1,51 +1,17 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { ValueCard } from './types';
 
-const values = [
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <path d="M14 3L17.5 10.5L26 11.5L20 17.5L21.5 26L14 22L6.5 26L8 17.5L2 11.5L10.5 10.5L14 3Z"
-          stroke="#b8975a" strokeWidth="1.5" strokeLinejoin="round"/>
-      </svg>
-    ),
-    title: 'Value One Here',
-    body: 'A short description of the first value goes here. Could be quality control, could be honestly, could be local roots, etc.',
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <rect x="3" y="3" width="22" height="22" rx="2" stroke="#b8975a" strokeWidth="1.5"/>
-        <path d="M8 14l4 4 8-8" stroke="#b8975a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-    title: 'Value two Here',
-    body: 'A short description of the first value goes here. Could be quality control, could be honestly, could be local roots, etc.',
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <path d="M14 2C8 2 3 7 3 14c0 5 3 9.5 7.5 11.5M14 2c6 0 11 5 11 12 0 5-3 9.5-7.5 11.5M14 2v24"
-          stroke="#b8975a" strokeWidth="1.5" strokeLinecap="round"/>
-        <path d="M3 14h22" stroke="#b8975a" strokeWidth="1.5" strokeLinecap="round"/>
-      </svg>
-    ),
-    title: 'Value Three Here',
-    body: 'A short description of the first value goes here. Could be quality control, could be honestly, could be local roots, etc.',
-  },
-  {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <path d="M14 25C14 25 4 19 4 11a10 10 0 0118 0c0 8-8 14-8 14z"
-          stroke="#b8975a" strokeWidth="1.5" strokeLinejoin="round"/>
-        <circle cx="14" cy="11" r="3" stroke="#b8975a" strokeWidth="1.5"/>
-      </svg>
-    ),
-    title: 'Value Four Here',
-    body: 'A short description of the first value goes here. Could be quality control, could be honestly, could be local roots, etc.',
-  },
-];
+
+import { FiAward, FiCheckSquare, FiShield } from "react-icons/fi";
+
+const ICONS = {
+  award: FiAward,
+  check: FiCheckSquare,
+  shield: FiShield,
+};
+
 
 const credentials = [
   { label: 'Credential 1', detail: 'Hopefully a liscense of some sort.' },
@@ -54,7 +20,15 @@ const credentials = [
   { label: 'Credential 4', detail: 'Soft cred, like 100% satisfaction gaurunteed.' },
 ];
 
-export default function About() {
+
+type AboutProps = {
+  values: [ValueCard, ValueCard, ValueCard, ValueCard];
+}
+
+
+
+
+export default function About({values}: AboutProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,8 +50,13 @@ export default function About() {
   }, []);
 
   return (
-    <section id="about" ref={ref} className="bg-[#faf8f5] py-28 lg:py-40">
+    <section id="about" ref={ref} className="bg-white py-28 lg:py-40">
       <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+
+
+
+
+
 
         {/* Top: Story */}
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-28 mb-28 items-center">
@@ -128,10 +107,14 @@ export default function About() {
         </div>
 
         {/* Section rule */}
-        <div className="section-rule mb-28" />
+        <div className="hidden section-rule mb-28" />
+
+
+
+
 
         {/* Values modules */}
-        <div className="mb-28">
+        <div className="hidden mb-28">
           <div className="text-center mb-16 reveal">
             <span className="text-[11px] tracking-[0.35em] uppercase text-[#b8975a] font-medium">What Drives Us</span>
             <h2 className="font-['Cormorant_Garamond'] text-[clamp(34px,4vw,52px)] font-light text-[#1a1714] mt-3">
@@ -140,32 +123,46 @@ export default function About() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#e8e2da]">
-            {values.map((v, i) => (
-              <div
-                key={v.title}
-                className={`reveal bg-[#faf8f5] p-8 lg:p-10 group hover:bg-[#1a1714] transition-colors duration-500 delay-${i * 100}`}
-                style={{ transitionDelay: `${i * 80}ms` }}
-              >
-                <div className="mb-6 group-hover:[&_path]:stroke-[#b8975a] group-hover:[&_rect]:stroke-[#b8975a] group-hover:[&_circle]:stroke-[#b8975a]">
-                  {v.icon}
-                </div>
-                <h3 className="font-['Cormorant_Garamond'] text-xl font-semibold text-[#1a1714] group-hover:text-[#faf8f5] transition-colors mb-3">
-                  {v.title}
-                </h3>
-                <p className="text-sm text-[#5c5550] group-hover:text-[#a39890] transition-colors leading-relaxed font-light">
-                  {v.body}
-                </p>
-              </div>
-            ))}
+{values.map((v, i) => {
+  const Icon = ICONS[v.icon];
+
+  return (
+    <div
+      key={v.title}
+      className="
+        reveal
+        bg-white
+        p-8 lg:p-10
+        group
+        hover:bg-stone-darkest
+        transition-colors
+        duration-500
+      "
+      style={{ transitionDelay: `${i * 80}ms` }}
+    >
+      <div className="mb-6">
+        <Icon className="h-7 w-7 text-gold" />
+      </div>
+
+      <h3 className="mb-3 font-['Cormorant_Garamond'] text-xl font-semibold text-stone-darkest transition-colors group-hover:text-white">
+        {v.title}
+      </h3>
+
+      <p className="text-sm font-light leading-relaxed text-stone-mid transition-colors group-hover:text-stone-light">
+        {v.body}
+      </p>
+    </div>
+  );
+})}
           </div>
         </div>
 
         {/* Section rule */}
-        <div className="section-rule mb-28" />
+        <div className="hidden section-rule mb-28" />
 
         {/* Credentials */}
         <div>
-          <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <div className="hidden flex flex-col lg:flex-row gap-12 items-start">
             <div className="lg:w-80 shrink-0 reveal-left">
               <span className="text-[11px] tracking-[0.35em] uppercase text-[#b8975a] font-medium">Trust & Credentials</span>
               <h2 className="font-['Cormorant_Garamond'] text-[clamp(30px,3.5vw,44px)] font-light text-[#1a1714] mt-3 leading-tight">

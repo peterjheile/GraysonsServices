@@ -6,18 +6,22 @@ import Gallery from '@/components/pages/home/Gallery';
 import Testimonials from '@/components//pages/home/Testimonials';
 import Contact from '@/components/pages/home/Contact';
 import Footer from '@/components/layout/Footer';
+
+import { QUICK_STATS, MARQUEE_SERVICES, ABOUT_VALUES } from "@/components/pages/home/data";
  
 export default function Home() {
   return (
     <main className="grain h-500">
       <Header />
-      <Hero />
-      {/* <MarqueeStrip />
-      <About />
+      <Hero quickStats = {QUICK_STATS} />
+      <MarqueeStrip services={MARQUEE_SERVICES}/>
+      <About values = {ABOUT_VALUES}/>
+            {/*
       <Gallery />
       <Testimonials />
       <Contact />
-      <Footer /> */}
+      <Footer />
+      */}
     </main>
   );
 }

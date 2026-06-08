@@ -1,0 +1,19 @@
+export type QuickStat = {
+    value: string;
+    label: string;
+}
+
+export type MarqueeServices = [
+  string,
+  string,
+  string,
+  string,
+  ...string[]
+];
+
+export type ValueIconName = "award" | "check" | "shield";
+export type ValueCard = {
+  icon: ValueIconName;
+  title: string;
+  body: string;
+};
