@@ -1,4 +1,4 @@
-import type { QuickStat, MarqueeServices, ValueCard, OurStory, CredCard, Project, category } from "./types";
+import type { QuickStat, MarqueeServices, ValueCard, OurStory, CredCard, Project, category, Testimonial } from "./types";
 import {
   FiAward,
   FiCheckSquare,
@@ -149,4 +149,48 @@ export const PROJECTS: Project[] = [
     img_url: '/services/Deck2.jpg',
   },
 ];
+
+
+export const TESTIMONIALS: Testimonial[] = [
+{
+    id: 1,
+    name: 'Billy (names here)',
+    role: 'Role goes here, such as: Homeowners, Bloomington',
+    stars: 5,
+    quote:
+      "Super Good Review will go here. One that is thought out from a client - maybe a trusted member of the community. This is the FEATURED review that will go here.",
+    project: 'Project Name in Gallery',
+    featured: true,
+  },
+  {
+    id: 2,
+    name: 'Billy Bob',
+    role: 'Role goes here, such as: Homeowners, Bloomington',
+    stars: 5,
+    quote:
+      'The review will go here. Again, ioptimally something well thought out, not too long and not too short. Many can go here.',
+    project: 'Project Name in Gallery',
+    featured: true,
+  },
+  {
+    id: 3,
+    name: 'Billy Bob',
+    role: 'Role goes here, such as: Homeowners, Bloomington',
+    stars: 5,
+    quote:
+      'The review will go here. Again, ioptimally something well thought out, not too long and not too short. Many can go here.',
+    project: 'Project Name in Gallery',
+    featured: false,
+  },
+  {
+    id: 4,
+    name: 'Billy Bob',
+    role: 'Role goes here, such as: Homeowners, Bloomington',
+    stars: 5,
+    quote:
+      'The review will go here. Again, ioptimally something well thought out, not too long and not too short. Many can go here.',
+    project: 'Project Name in Gallery',
+    featured: false,
+  },
+]
 

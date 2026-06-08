@@ -52,3 +52,13 @@ export type Project = {
   size: size,
   img_url: string
 }
+
+export type Testimonial = {
+  id: number,
+  name: string,
+  role: string,
+  stars: number,
+  quote: string,
+  project: string,
+  featured: boolean
+}
