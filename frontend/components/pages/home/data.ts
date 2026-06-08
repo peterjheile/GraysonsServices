@@ -1,4 +1,4 @@
-import type { QuickStat, MarqueeServices, ValueCard, OurStory, CredCard } from "./types";
+import type { QuickStat, MarqueeServices, ValueCard, OurStory, CredCard, Project, category } from "./types";
 import {
   FiAward,
   FiCheckSquare,
@@ -90,3 +90,63 @@ export const OUR_STORY: OurStory = {
     ],
     url: `https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80`
 }
+
+
+export const CATEGORIES: category[] = [
+    'All', 'Decks', 'Driveways', 'Retaining Walls', "Walkways"
+]
+
+
+
+
+export const PROJECTS: Project[] = [
+  {
+    id: 1,
+    title: 'Simple Wooden Deck',
+    category: 'Decks',
+    location: 'Bloomington, IN',
+    size: 'large',
+    img_url: '/services/Deck1.jpg',
+  },
+  {
+    id: 2,
+    title: 'Quality Retaining Wall',
+    category: 'Retaining Walls',
+    location: 'Bloomington, IN',
+    size: 'small',
+    img_url: '/services/RetainingWall1.jpg',
+  },
+  {
+    id: 3,
+    title: 'Curved Walkways',
+    category: 'Walkways',
+    location: 'Bloomington, IN',
+    size: 'small',
+    img_url: '/services/Walkway1.jpg',
+  },
+  {
+    id: 4,
+    title: 'Gravel Driveway Touch Up',
+    category: 'Driveways',
+    location: 'Bloomington, IN',
+    size: 'small',
+    img_url: '/services/Driveway1.jpg',
+  },
+  {
+    id: 6,
+    title: 'Layered Stone Retaining Wall',
+    category: 'Retaining Walls',
+    location: 'Bloomington, IN',
+    size: 'large',
+    img_url: '/services/RetainingWall2.jpg',
+  },
+  {
+    id: 5,
+    title: 'Floating Wooden Deck',
+    category: 'Decks',
+    location: 'Bloomington, IN',
+    size: 'small',
+    img_url: '/services/Deck2.jpg',
+  },
+];
+

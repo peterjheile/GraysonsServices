@@ -32,3 +32,23 @@ export type OurStory = {
   paragraphs: string[];
   url: string;
 }
+
+export type size = 
+  | 'small'
+  | 'large'
+
+export type category =
+  | 'All'
+  | 'Decks'
+  | 'Driveways'
+  | 'Retaining Walls'
+  | 'Walkways';
+
+export type Project = {
+  id: number,
+  title: string,
+  category: category,
+  location: string,
+  size: size,
+  img_url: string
+}
