@@ -7,7 +7,7 @@ import Testimonials from '@/components//pages/home/Testimonials';
 import Contact from '@/components/pages/home/Contact';
 import Footer from '@/components/layout/Footer';
 
-import { QUICK_STATS, MARQUEE_SERVICES, ABOUT_VALUES } from "@/components/pages/home/data";
+import { QUICK_STATS, MARQUEE_SERVICES, ABOUT_VALUES, OUR_STORY, CRENTIAL_VALUES } from "@/components/pages/home/data";
  
 export default function Home() {
   return (
@@ -15,7 +15,11 @@ export default function Home() {
       <Header />
       <Hero quickStats = {QUICK_STATS} />
       <MarqueeStrip services={MARQUEE_SERVICES}/>
-      <About values = {ABOUT_VALUES}/>
+      <About 
+        values = {ABOUT_VALUES}
+        story = {OUR_STORY}
+        credentials={CRENTIAL_VALUES}
+      />
             {/*
       <Gallery />
       <Testimonials />

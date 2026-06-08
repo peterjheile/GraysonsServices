@@ -17,3 +17,18 @@ export type ValueCard = {
   title: string;
   body: string;
 };
+
+
+export type CredCard = {
+  title: string;
+  body: string;
+};
+
+
+export type OurStory = {
+  eyebrow: string;
+  titleLineNormal: string;
+  titleLineHighlight: string;
+  paragraphs: string[];
+  url: string;
+}
