@@ -62,3 +62,12 @@ export type Testimonial = {
   project: string,
   featured: boolean
 }
+
+export type ContactFormPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  serviceType: string;
+  projectDetails: string;
+};

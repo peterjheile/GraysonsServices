@@ -22,10 +22,9 @@ export default function Home() {
       />
       <Gallery projects={PROJECTS}/>
       <Testimonials testimonials = {TESTIMONIALS}/>
-              {/*
       <Contact />
       <Footer />
-      */}
+     
     </main>
   );
 }
