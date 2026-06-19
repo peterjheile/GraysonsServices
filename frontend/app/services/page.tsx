@@ -9,14 +9,14 @@ import MaterialsSection from "@/components/pages/services/MaterialsSection"
 export default function ServicesPage() {
 
     return (
-    <main className="grain">
+    <main className="grain h-1000">
         <Header />
         <ServicesHero/>
         <ServicesNav/>
         <ServicesGrid/>
-        <ProcessSection/>
+        {/* <ProcessSection/> */}
         {/* <MaterialsSection/> */}
-        <Footer/>
+        {/* <Footer/> */}
     </main>
     )
 }
