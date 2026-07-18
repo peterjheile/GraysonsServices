@@ -1,14 +1,17 @@
+import { getSiteSettings } from '@/features/site-settings/api';
+
 import HeaderClient from "./Header-Client";
-
-import {HEADER_NAV_ITEMS} from "./data"
-
+import {HEADER_NAV_ITEMS} from "./view-data"
 
 
-export default function Header() {
 
-  //Here I will eventually change to retrieve the logo and pass to the client component
+export default async function Header() {
+  const settings = await getSiteSettings();
 
   return (
-    <HeaderClient navItems={HEADER_NAV_ITEMS}/>
+    <HeaderClient
+      navItems={HEADER_NAV_ITEMS}
+      logoUrl={settings.logo_url}
+    />
   );
 }

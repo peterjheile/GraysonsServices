@@ -1,17 +1,12 @@
 import type { Metadata } from 'next';
+
+import { getSiteMetadata } from '@/features/site-settings/metadata';
+
 import './globals.css';
 
-export const metadata: Metadata = {
-  title: "Grayson's Services | Premium Hardscaping",
-  description:
-    "Expert hardscaping in the Greater Ohio Region. Stone patios, retaining walls, outdoor kitchens, driveways and more — crafted to last a lifetime.",
-  keywords: ['hardscaping', 'stone patio', 'retaining wall', 'outdoor kitchen', 'Ohio'],
-  openGraph: {
-    title: "Grayson's Services | Premium Hardscaping",
-    description: 'Crafting outdoor spaces that last — for homeowners and developers who demand the best.',
-    type: 'website',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getSiteMetadata();
+}
 
 export default function RootLayout({
   children,

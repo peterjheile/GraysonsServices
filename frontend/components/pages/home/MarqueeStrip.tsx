@@ -1,5 +1,7 @@
+import type { ServiceNames } from "@/features/services/types";
+
 type MarqueeStripProps = {
-  services: string[];
+  services: ServiceNames;
 };
 
 export default function MarqueeStrip({ services }: MarqueeStripProps) {
@@ -15,7 +17,7 @@ export default function MarqueeStrip({ services }: MarqueeStripProps) {
               className="flex shrink-0 items-center gap-6 px-6"
             >
               <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-darkest">
-                {item}
+                {item.name}
               </span>
               <span className="text-lg text-stone-darkest/40">◆</span>
             </div>
@@ -29,7 +31,7 @@ export default function MarqueeStrip({ services }: MarqueeStripProps) {
               className="flex shrink-0 items-center gap-6 px-6"
             >
               <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-darkest">
-                {item}
+                {item.name}
               </span>
               <span className="text-lg text-stone-darkest/40">◆</span>
             </div>

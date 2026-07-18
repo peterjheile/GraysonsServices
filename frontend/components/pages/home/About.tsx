@@ -1,68 +1,105 @@
-import { CredCard, OurStory, ValueCard } from './types';
-import { FiAward, FiCheckSquare, FiShield } from 'react-icons/fi';
+import { CredCard, AboutUs, ValueCard } from './view-types';
+import {
+  FiAward,
+  FiMessageCircle,
+  FiShield,
+  FiTool,
+} from 'react-icons/fi';
 import RevealObserver from "./RevealObserverClient"
+import { QuickStats } from '@/features/company-stats/types';
 
 const ICONS = {
-  award: FiAward,
-  check: FiCheckSquare,
-  shield: FiShield,
+  craftsmanship: FiTool,
+  communication: FiMessageCircle,
+  commitment: FiAward,
+  dependable: FiShield,
 };
 
 type AboutProps = {
   values: [ValueCard, ValueCard, ValueCard, ValueCard];
-  story: OurStory;
+  about: AboutUs;
   credentials: [CredCard, CredCard, CredCard, CredCard];
+  quickStats: QuickStats | null;
 };
 
-export default function About({ values, story, credentials }: AboutProps) {
+export default function About({ values, about, credentials, quickStats}: AboutProps) {
   return (
     <RevealObserver>
       <section id="about" className="bg-white py-28 lg:py-40">
         <div className="max-w-(--max-content-width) mx-auto px-6 lg:px-12">
 
-          {/* Our Story Section */}
-          <div className="grid lg:grid-cols-2 gap-16 lg:gap-28 mb-28 items-center">
+        {/* Our Story Section */}
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-28 mb-28 items-center">
 
-            {/* Image block */}
-            <div className="reveal-left relative mx-auto w-full max-w-112">
+          {/* Image block */}
+          <div className="reveal-left relative mx-auto w-full max-w-112">
+            <div className="relative aspect-4/5 w-full overflow-hidden lg:aspect-3/4">
               <div
-                className="w-full aspect-4/5 lg:aspect-3/4 bg-cover bg-center"
-                style={{ backgroundImage: `url(${story.url})` }}
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${about.url})` }}
               />
-                {/* Offset accent box */}
-                <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-gold/10 border border-gold/30 hidden lg:block" />
-                {/* Floating info chip */}
-                <div className="absolute -bottom-4 left-8 lg:left-0 lg:-translate-x-12 bg-stone-darkest px-6 py-5 shadow-xl">
-                  <div className="font-['Cormorant_Garamond'] text-4xl text-gold font-semibold">5+</div>
-                  <div className="text-[10px] tracking-[0.2em] uppercase text-stone-light mt-1">Years of Excellence</div>
-                </div>
+
+              {/* Subtle edge vignette */}
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: `
+                    radial-gradient(
+                      ellipse at center,
+                      transparent 55%,
+                      rgba(26, 23, 20, 0.08) 78%,
+                      rgba(26, 23, 20, 0.25) 100%
+                    )
+                  `,
+                }}
+              />
             </div>
 
-            {/* Text block */}
-            <div className="reveal-right">
-              <div className="gold-line" />
-              <span className="text-[11px] tracking-[0.35em] uppercase text-gold font-medium">Our Story</span>
+            {/* Floating info chip */}
+            {quickStats && (
+              <div className="absolute -bottom-4 left-1/2 z-20 -translate-x-1/2 bg-stone-darkest px-6 py-5 text-center shadow-xl lg:left-0 lg:-translate-x-12">
+                <div className="font-['Cormorant_Garamond'] text-4xl font-semibold text-gold">
+                  {quickStats.years_in_business.value}+
+                </div>
 
-              <h2 className="font-['Cormorant_Garamond'] text-[clamp(36px,4.5vw,60px)] font-light text-stone-darkest leading-[1.1] mt-4 mb-8">
-                Our Story Header,<br />
-                <em className="italic text-gold">Goes Right Here</em>
-              </h2>
-
-              <div className="space-y-5 text-stone-mid leading-relaxed text-base font-light">
-                {story.paragraphs.map((paragraph) => (
-                  <p key={paragraph}>
-                    {paragraph}
-                  </p>
-                ))}
+                <div className="mt-1 text-[10px] tracking-[0.2em] text-stone-light uppercase">
+                  Years of Excellence
+                </div>
               </div>
+            )}
+          </div>
 
-              <div className="mt-10">
-                <a href="#contact" className="btn-primary">
-                  <span>Meet the Team</span>
-                </a>
-              </div>
+          {/* Text block */}
+          <div className="reveal-right text-center lg:text-left">
+            <div className="gold-line mx-auto lg:mx-0 flex justify-center lg:block" />
+
+            <span className="text-[11px] tracking-[0.35em] uppercase text-gold font-medium">
+              {about.eyebrow}
+            </span>
+
+            <h2 className="font-['Cormorant_Garamond'] text-[clamp(36px,4.5vw,60px)] font-light text-stone-darkest leading-[1.1] mt-4 mb-8">
+              {about.titleLineNormal}
+              <br />
+              <em className="italic text-gold">
+                {about.titleLineHighlight}
+              </em>
+            </h2>
+
+            <div className="space-y-5 text-stone-mid leading-relaxed text-base font-light">
+              {about.paragraphs.map((paragraph) => (
+                <p key={paragraph} className = "max-w-100 lg:max-w-full mx-auto lg:mx-0">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            <div className="mt-10 flex justify-center lg:justify-start">
+              <a href="/services" className="btn-primary">
+                <span>See our Services</span>
+              </a>
             </div>
           </div>
+        </div>
 
           {/* Section rule */}
           <div className="section-rule mb-28" />
@@ -71,9 +108,9 @@ export default function About({ values, story, credentials }: AboutProps) {
           {/* Values modules */}
           <div className="mb-28">
             <div className="text-center mb-16 reveal">
-              <span className="text-[11px] tracking-[0.35em] uppercase text-gold font-medium">What Drives Us</span>
+              <span className="text-[11px] tracking-[0.35em] uppercase text-gold font-medium">What Defines Us</span>
               <h2 className="font-['Cormorant_Garamond'] text-[clamp(34px,4vw,52px)] font-light text-stone-darkest mt-3">
-                Core Values Title Here
+                The Values Behind Our Work
               </h2>
             </div>
 
@@ -109,12 +146,12 @@ export default function About({ values, story, credentials }: AboutProps) {
             </div>
 
 
-            {/* Section rule */}
+{/* 
             <div className="section-rule mb-28" />
 
 
 
-            {/* Credentials */}
+            
             <div className="mt-20 lg:mt-28">
               <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12">
                 
@@ -180,7 +217,7 @@ export default function About({ values, story, credentials }: AboutProps) {
                   ))}
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
     </RevealObserver>

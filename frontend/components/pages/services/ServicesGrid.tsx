@@ -57,7 +57,7 @@ const services = [
 
 export default function ServicesGrid() {
   return (
-    <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 overflow-hidden">
       {services.map((s) => (
         <ServiceBlock key={s.id} {...s} />
       ))}

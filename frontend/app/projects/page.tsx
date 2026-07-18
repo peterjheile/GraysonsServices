@@ -14,13 +14,13 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <main className="grain">
+    <main className="grain overflow-hidden">
       <Header />
       <ProjectsHero />
       <ProjectsGrid />
-      <TransformationStrip />
-      <ProjectsCTA />
-      <Footer />
+      {/* <TransformationStrip /> */}
+      {/* <ProjectsCTA /> */}
+      {/* <Footer /> */}
     </main>
   );
 }

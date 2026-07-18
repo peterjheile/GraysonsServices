@@ -14,9 +14,9 @@ export default function ServicesPage() {
         <ServicesHero/>
         <ServicesNav/>
         <ServicesGrid/>
-        {/* <ProcessSection/> */}
+        <ProcessSection/>
         {/* <MaterialsSection/> */}
-        {/* <Footer/> */}
+        <Footer/>
     </main>
     )
 }

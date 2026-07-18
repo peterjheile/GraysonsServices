@@ -1,14 +1,16 @@
-import type { QuickStat } from "./types";
+import type { CompanyStats } from "@/features/company-stats/types";
 import ParallaxHero from "@/components/ui/parallax-hero";
+import { QuickStats } from "@/features/company-stats/types";
 
 
 type HeroClientProps = {
-  quickStats: [QuickStat, QuickStat, QuickStat];
-}
+  quickStats: QuickStats | null;
+};
 
 
 
 export default function Hero({quickStats}: HeroClientProps) {
+  
 
 
   return (
@@ -16,26 +18,28 @@ export default function Hero({quickStats}: HeroClientProps) {
       
       {/* Background Image with Parallax */}
       <ParallaxHero
-        imageUrl = "/home/hero.jpg"
+        imageUrl = "/images/defaults/home/hero.jpg"
         backgroundPosition = "center 0%"
       />
 
       {/* Readability Gradient Overlays */}
       <div className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-black/80 via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-linear-to-t from-stone-darkest via-stone-darkest/40 to-transparent" />
-        <div className="absolute inset-0 bg-linear-to-r from-stone-darkest/70 via-stone-darkest/20 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-stone-darkest via-stone-darkest/40 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-r from-stone-darkest/70 via-stone-darkest/20 to-transparent" />
 
-        {/* Floating Quality Badge */}
-        <div className = "absolute left-1/2 -translate-x-1/2 h-full w-full max-w-(--max-content-width) min-w-(--min-content-width)">
-          <div className="absolute top-7/16 right-12 lg:right-24 float-badge hidden md:flex h-28 w-28 lg:h-36 lg:w-36 flex-col items-center justify-center rounded-full border border-gold/60 bg-stone-darkest/40 backdrop-blur-sm will-change-transform transform-gpu shadow-[0_0_0_1px_rgba(184,151,90,0.25)]">
-            <span className="font-['Cormorant_Garamond'] text-3xl lg:text-4xl font-light text-white leading-none">
-              5+
-            </span>
-            <span className="mt-1 text-center text-[9px] lg:text-[10px] font-medium uppercase leading-tight tracking-[0.2em] text-gold">
-              Years<br />Experience
-            </span>
+      {/* Floating Quality Badge */}
+      {quickStats && (
+      <div className = "absolute left-1/2 -translate-x-1/2 h-full w-full max-w-(--max-content-width) min-w-(--min-content-width)">
+        <div className="absolute top-7/16 right-12 lg:right-24 float-badge hidden md:flex h-28 w-28 lg:h-36 lg:w-36 flex-col items-center justify-center rounded-full border border-gold/60 bg-stone-darkest/40 backdrop-blur-sm will-change-transform transform-gpu shadow-[0_0_0_1px_rgba(184,151,90,0.25)]">
+          <span className="font-['Cormorant_Garamond'] text-3xl lg:text-4xl font-light text-white leading-none">
+            {quickStats.years_in_business.value}+
+          </span>
+          <span className="mt-2 text-center text-[9px] lg:text-[10px] font-medium uppercase leading-tight tracking-[0.2em] text-gold">
+            Years<br />Experience
+          </span>
         </div>
       </div>
+      )}
 
 
 
@@ -120,33 +124,37 @@ export default function Hero({quickStats}: HeroClientProps) {
 
 
       {/* Bottom Stats Bar */}
+      {quickStats && (
       <div className = "absolute left-1/2 -translate-x-1/2 h-full w-full max-w-(--max-content-width) min-w-(--min-content-width)">
         <div
           className="absolute bottom-0 right-0 hidden lg:flex max-w-110 border-r border-gold/20"
           style={{ animation: "hero-word-in 1s 1s both" }}
         >
-          {quickStats.map((stat) => (
-            <div
-              key={stat.label}
-              className="
-                w-44
-                px-6 py-5
-                border-l border-t border-gold/20
-                bg-stone-darkest/70
-                backdrop-blur-sm
-              "
-            >
-              <div className="font-['Cormorant_Garamond'] text-3xl font-semibold text-gold">
-                {stat.value}
-              </div>
+          {quickStats &&
+            Object.values(quickStats).map((stat) => (
+              <div
+                key={stat.label}
+                className="
+                  w-44
+                  border-l border-t border-gold/20
+                  bg-stone-darkest/70
+                  px-6 py-5
+                  backdrop-blur-sm
+                "
+              >
+                <div className="font-['Cormorant_Garamond'] text-3xl font-semibold text-gold">
+                  {stat.value}
+                  {stat.suffix}
+                </div>
 
-              <div className="mt-1 text-[10px] uppercase tracking-[0.15em] text-stone-light">
-                {stat.label}
+                <div className="mt-1 text-[10px] tracking-[0.15em] text-stone-light uppercase">
+                  {stat.label}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
+      )}
 
     </section>
   );

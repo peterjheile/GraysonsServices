@@ -1,6 +1,6 @@
 'use client';
 
-import type { ContactFormPayload } from './types';
+import type { ContactFormPayload } from './view-types';
 import type { SyntheticEvent } from 'react';
 
 export default function ContactFormClient() {

@@ -54,7 +54,7 @@ export default function ServiceBlock({
     <article
       id={id}
       ref={ref}
-      className="scroll-mt-32 border-b border-[#e8e2da] py-24 last:border-none lg:py-32"
+      className="scroll-mt-32 border-b border-stone-pale py-24 last:border-none lg:py-32"
     >
       {/* Centered container with max width */}
       <div className="mx-auto w-full max-w-7xl px-6 lg:px-10">
@@ -68,7 +68,7 @@ export default function ServiceBlock({
             className={`w-full lg:w-1/2 reveal-${flip ? 'right' : 'left'}`}
           >
             {/* Main image */}
-            <div className="project-card relative mb-3 aspect-[4/3] w-full overflow-hidden">
+            <div className="project-card relative mb-3 aspect-4/3 w-full overflow-hidden">
               <img
                 src={images[0]}
                 alt={title}
@@ -76,8 +76,8 @@ export default function ServiceBlock({
               />
 
               {/* Number badge */}
-              <div className="absolute left-5 top-5 flex h-10 w-10 items-center justify-center bg-[#b8975a]">
-                <span className="font-['Cormorant_Garamond'] text-lg font-semibold text-[#1a1714]">
+              <div className="absolute left-5 top-5 flex h-10 w-10 items-center justify-center bg-gold">
+                <span className="font-['Cormorant_Garamond'] text-lg font-semibold text-stone-darkest">
                   {String(index).padStart(2, '0')}
                 </span>
               </div>
@@ -89,7 +89,7 @@ export default function ServiceBlock({
                 {images.slice(1, 3).map((src, i) => (
                   <div
                     key={i}
-                    className="project-card relative aspect-[3/2] overflow-hidden"
+                    className="project-card relative aspect-3/2 overflow-hidden"
                   >
                     <img
                       src={src}
@@ -108,18 +108,18 @@ export default function ServiceBlock({
           >
             {/* Eyebrow */}
             <div className="mb-5 flex items-center gap-3">
-              <div className="h-[1px] w-6 bg-[#b8975a]" />
-              <span className="text-[10px] font-medium uppercase tracking-[0.35em] text-[#b8975a]">
+              <div className="h-px w-6 bg-gold" />
+              <span className="text-[10px] font-medium uppercase tracking-[0.35em] text-gold">
                 {eyebrow}
               </span>
             </div>
 
             {/* Title */}
-            <h2 className="mb-2 font-['Cormorant_Garamond'] text-[clamp(32px,4vw,52px)] font-light leading-tight text-[#1a1714]">
+            <h2 className="mb-2 font-['Cormorant_Garamond'] text-[clamp(32px,4vw,52px)] font-light leading-tight text-stone-darkest">
               {title}
             </h2>
 
-            <p className="mb-8 font-['Cormorant_Garamond'] text-xl font-light italic text-[#a39890]">
+            <p className="mb-8 font-['Cormorant_Garamond'] text-xl font-light italic text-stone-light">
               {subtitle}
             </p>
 
@@ -128,7 +128,7 @@ export default function ServiceBlock({
               {description.map((para, i) => (
                 <p
                   key={i}
-                  className="text-sm font-light leading-relaxed text-[#5c5550]"
+                  className="text-sm font-light leading-relaxed text-stone-mid"
                 >
                   {para}
                 </p>
@@ -137,7 +137,7 @@ export default function ServiceBlock({
 
             {/* Features list */}
             <div className="mb-10">
-              <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.25em] text-[#a39890]">
+              <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.25em] text-stone-light">
                 What's Included
               </p>
 
@@ -145,9 +145,9 @@ export default function ServiceBlock({
                 {features.map((f) => (
                   <li
                     key={f}
-                    className="flex items-start gap-3 text-sm font-light text-[#1a1714]"
+                    className="flex items-start gap-3 text-sm font-light text-stone-darkest"
                   >
-                    <span className="mt-1 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-[#b8975a]/50">
+                    <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-gold/50">
                       <svg
                         width="8"
                         height="8"
