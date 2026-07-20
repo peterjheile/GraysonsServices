@@ -1,0 +1,21 @@
+A new contact form submission has been received.
+
+CONTACT INFORMATION
+
+Name: {{ full_name }}
+Email: {{ submission.email }}
+Phone: {{ submission.phone|default:"Not provided" }}
+
+SUBJECT
+
+{{ submission.subject }}
+
+MESSAGE
+
+{{ submission.message }}
+
+SUBMITTED
+
+{{ submitted_at|date:"F j, Y \a\t g:i A" }}
+
+Reply directly to this email to respond to {{ submission.first_name }}.

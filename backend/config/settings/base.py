@@ -30,6 +30,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
+    "anymail"
 ]
 
 LOCAL_APPS = [
@@ -37,6 +38,7 @@ LOCAL_APPS = [
     "services",
     "projects",
     "reviews",
+    "contact"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -137,9 +139,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
-    ],
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.MultiPartParser",
@@ -153,3 +152,22 @@ UNFOLD = {
     "SITE_HEADER": "Website Administration",
     "SITE_SYMBOL": "settings",
 }
+
+
+
+
+
+ANYMAIL = {
+    "RESEND_API_KEY": config(
+        "RESEND_API_KEY",
+        default="",
+    ),
+}
+
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL",
+)
+
+CONTACT_NOTIFICATION_EMAIL = config(
+    "CONTACT_NOTIFICATION_EMAIL",
+)

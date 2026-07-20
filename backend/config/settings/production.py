@@ -43,6 +43,20 @@ SECURE_SSL_REDIRECT = config(
     cast=bool,
 )
 
+REST_FRAMEWORK = {
+    **REST_FRAMEWORK,
+    "DEFAULT_THROTTLE_RATES": {
+        "contact_burst": "3/minute",
+        "contact_daily": "5/day",
+    },
+}
+
+
+
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+
+
+
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31_536_000
