@@ -1,10 +1,11 @@
 export type AboutUs = {
+  url: string;
+  imageAlt: string;
   eyebrow: string;
   titleLineNormal: string;
   titleLineHighlight: string;
   paragraphs: string[];
-  url: string;
-}
+};
 
 
 

@@ -1,84 +1,281 @@
-const footerLinks = {
-  Services: ['Stone Patios', 'Retaining Walls', 'Outdoor Kitchens', 'Fire Features', 'Driveway Pavers', 'Walkways & Steps'],
-  Company: ['About Us', 'Our Team', 'Portfolio', 'Testimonials', 'Blog', 'Careers'],
-  Contact: ['Get a Quote', '(555) 123-4567', 'hello@graysonsservices.com', 'Greater Ohio Region'],
-};
+import Link from 'next/link';
+import {
+  FiFacebook,
+  FiHelpCircle,
+  FiInstagram,
+  FiLinkedin,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiFileText,
+} from 'react-icons/fi';
 
-export default function Footer() {
+import { getServiceNames } from '@/features/services/api';
+import { getSiteSettings } from '@/features/site-settings/api';
+
+import { FOOTER_SUMMARY, NAV_ITEMS } from './view-data';
+
+export default async function Footer() {
+  const [siteSettings, services] = await Promise.all([
+    getSiteSettings(),
+    getServiceNames(),
+  ]);
+
+  const phoneHref = siteSettings.phone
+    ? `tel:${siteSettings.phone.replace(/[^\d+]/g, '')}`
+    : null;
+
+  const socialLinks = [
+    {
+      label: 'Facebook',
+      href: siteSettings.facebook_url,
+      icon: FiFacebook,
+    },
+    {
+      label: 'Instagram',
+      href: siteSettings.instagram_url,
+      icon: FiInstagram,
+    },
+    {
+      label: 'LinkedIn',
+      href: siteSettings.linkedin_url,
+      icon: FiLinkedin,
+    },
+    {
+      label: 'Google Business',
+      href: siteSettings.google_business_url,
+      icon: FiMapPin,
+    },
+  ].filter(
+    (
+      link,
+    ): link is {
+      label: string;
+      href: string;
+      icon: typeof FiFacebook;
+    } => Boolean(link.href),
+  );
+
   return (
-    <footer className="bg-[#1a1714] border-t border-[#2d2926]">
-
-      {/* Main footer */}
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-20 lg:py-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
-
-          {/* Brand column */}
+    <footer className="border-t border-stone-dark bg-stone-darkest">
+      <div className="mx-auto max-w-(--max-content-width) px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5 lg:gap-8">
+          {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="mb-6">
-              <div className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#faf8f5] tracking-wide">
-                Grayson's
-              </div>
-              <div className="text-[10px] tracking-[0.35em] uppercase text-[#b8975a] font-medium mt-0.5">
-                Services
-              </div>
-            </div>
+            <Link
+              href="/"
+              className="inline-block transition-opacity hover:opacity-80"
+            >
+              <span className="block font-['Cormorant_Garamond'] text-3xl font-semibold tracking-wide text-white">
+                {siteSettings.business_name}
+              </span>
+            </Link>
 
-            <p className="text-[#5c5550] text-sm leading-relaxed font-light mb-8 max-w-xs">
-              Premium hardscaping built to last — for homeowners and developers who demand the very best in craftsmanship and design.
+            <p className="mt-6 max-w-sm text-sm leading-7 font-light text-stone-pale/60">
+              {FOOTER_SUMMARY}
             </p>
 
-            {/* Social links */}
-            <div className="flex gap-3">
-              {['FB', 'IG', 'HZ', 'LI'].map((s) => (
-                <a
-                  key={s}
-                  href="#"
-                  className="w-9 h-9 border border-[#2d2926] flex items-center justify-center text-[10px] font-semibold tracking-wide text-[#5c5550] hover:border-[#b8975a] hover:text-[#b8975a] transition-all duration-200"
-                >
-                  {s}
-                </a>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="mt-8 flex gap-3">
+                {socialLinks.map(({ label, href, icon: Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="
+                      flex size-10 items-center justify-center
+                      border border-stone-dark text-stone-pale/60
+                      transition-colors duration-200
+                      hover:border-gold hover:text-gold
+                    "
+                  >
+                    <Icon aria-hidden="true" className="size-4" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Link columns */}
-          {Object.entries(footerLinks).map(([group, links]) => (
-            <div key={group}>
-              <h4 className="text-[10px] tracking-[0.3em] uppercase text-[#b8975a] font-medium mb-6">
-                {group}
-              </h4>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-[#5c5550] hover:text-[#a39890] transition-colors duration-200 font-light"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Services */}
+          {services.length > 0 && (
+            <FooterColumn title="Services">
+              {services.map((service) => (
+                <FooterLink
+                  key={service.slug}
+                  label={service.name}
+                  href={`/services#${service.slug}`}
+                />
+              ))}
+
+              <FooterLink label="View All Services" href="/services" />
+            </FooterColumn>
+          )}
+
+          {/* Company */}
+          <FooterColumn
+            title="Company"
+            className={services.length === 0 ? 'lg:col-start-4' : undefined}
+          >
+            {NAV_ITEMS.map((link) => (
+              <FooterLink key={link.href} {...link} />
+            ))}
+          </FooterColumn>
+
+          {/* Contact */}
+          <FooterColumn title="Contact">
+            <ContactLink
+              label="Ask a Question"
+              href="/#contact"
+              icon={FiHelpCircle}
+            />
+
+            <ContactLink
+              label="Request a Quote"
+              href="/contact"
+              icon={FiFileText}
+            />
+
+            {siteSettings.phone && phoneHref && (
+              <ContactLink
+                label={siteSettings.phone}
+                href={phoneHref}
+                icon={FiPhone}
+              />
+            )}
+
+            {siteSettings.email && (
+              <ContactLink
+                label={siteSettings.email}
+                href={`mailto:${siteSettings.email}`}
+                icon={FiMail}
+              />
+            )}
+
+            {siteSettings.service_area && (
+              <ContactLink
+                label={siteSettings.service_area}
+                icon={FiMapPin}
+              />
+            )}
+          </FooterColumn>
         </div>
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-[#2d2926]">
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[11px] text-[#3d3632] tracking-wide">
-            © {new Date().getFullYear()} Grayson's Services. All rights reserved.
+      <div className="border-t border-stone-dark">
+        <div
+          className="
+            mx-auto flex max-w-(--max-content-width) flex-col
+            items-center justify-between gap-3 px-4 py-5
+            sm:flex-row sm:px-6 lg:px-10
+          "
+        >
+          <p className="text-center text-[11px] tracking-wide text-stone-pale/40 sm:text-left">
+            © {new Date().getFullYear()} {siteSettings.business_name}. All
+            rights reserved.
           </p>
-          <div className="flex gap-6">
-            {['Privacy Policy', 'Terms of Service', 'Sitemap'].map((link) => (
-              <a key={link} href="#" className="text-[11px] text-[#3d3632] hover:text-[#5c5550] transition-colors">
-                {link}
-              </a>
-            ))}
+
+          <div className="flex items-center gap-5">
+            <Link
+              href="/privacy"
+              className="text-[11px] text-stone-pale/40 transition-colors hover:text-stone-pale/70"
+            >
+              Privacy Policy
+            </Link>
+
+            <Link
+              href="/sitemap.xml"
+              className="text-[11px] text-stone-pale/40 transition-colors hover:text-stone-pale/70"
+            >
+              Sitemap
+            </Link>
           </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+type FooterColumnProps = {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+};
+
+function FooterColumn({
+  title,
+  children,
+  className = '',
+}: FooterColumnProps) {
+  return (
+    <div className={className}>
+      <h2 className="mb-6 text-[10px] font-medium tracking-[0.3em] text-gold uppercase">
+        {title}
+      </h2>
+
+      <ul className="space-y-3">{children}</ul>
+    </div>
+  );
+}
+
+type FooterLinkProps = {
+  label: string;
+  href: string;
+};
+
+function FooterLink({ label, href }: FooterLinkProps) {
+  return (
+    <li>
+      <Link
+        href={href}
+        className="
+          text-sm font-light text-stone-pale/60
+          transition-colors duration-200 hover:text-white
+        "
+      >
+        {label}
+      </Link>
+    </li>
+  );
+}
+
+type ContactLinkProps = {
+  label: string;
+  href?: string;
+  icon: React.ComponentType<{
+    className?: string;
+    'aria-hidden'?: boolean;
+  }>;
+};
+
+function ContactLink({ label, href, icon: Icon }: ContactLinkProps) {
+  const content = (
+    <>
+      <Icon aria-hidden className="mt-1 size-3.5 shrink-0 text-gold" />
+      <span>{label}</span>
+    </>
+  );
+
+  return (
+    <li>
+      {href ? (
+        <a
+          href={href}
+          className="
+            flex items-start gap-2.5 text-sm leading-6
+            font-light text-stone-pale/60
+            transition-colors duration-200 hover:text-white
+          "
+        >
+          {content}
+        </a>
+      ) : (
+        <span className="flex items-start gap-2.5 text-sm leading-6 font-light text-stone-pale/60">
+          {content}
+        </span>
+      )}
+    </li>
   );
 }

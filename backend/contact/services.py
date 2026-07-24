@@ -35,3 +35,35 @@ def send_contact_notification(submission):
 
     email.attach_alternative(html_body, "text/html")
     email.send(fail_silently=False)
+
+
+
+
+def send_contact_confirmation(submission):
+    full_name = f"{submission.first_name} {submission.last_name}".strip()
+
+    context = {
+        "submission": submission,
+        "full_name": full_name,
+    }
+
+    text_body = render_to_string(
+        "contact/emails/contact_confirmation.txt",
+        context,
+    )
+
+    html_body = render_to_string(
+        "contact/emails/contact_confirmation.html",
+        context,
+    )
+
+    email = EmailMultiAlternatives(
+        subject="We received your message | Grayson's Services",
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[submission.email],
+        reply_to=[settings.CONTACT_NOTIFICATION_EMAIL],
+    )
+
+    email.attach_alternative(html_body, "text/html")
+    email.send(fail_silently=False)

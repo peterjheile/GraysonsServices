@@ -20,94 +20,88 @@ export default function HeaderClient({
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
+    const handleScroll = () => {
       setScrolled(window.scrollY > 40);
     };
 
-    onScroll();
+    handleScroll();
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    const previousOverflow = document.body.style.overflow;
+
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    }
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = previousOverflow;
     };
   }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <>
       <header
         className={`
-          fixed top-0 right-0 left-0 z-50
-          transition-all duration-500
+          fixed inset-x-0 top-0 z-50
+          transition-[background-color,box-shadow] duration-500
           ${
             scrolled || menuOpen
-              ? 'bg-stone-dark shadow-[0_1px_0_rgba(184,151,90,0.2)] backdrop-blur-md'
+              ? 'bg-stone-dark shadow-[0_1px_0_rgba(184,151,90,0.2)]'
               : 'bg-transparent'
           }
         `}
       >
-        <div
-          className={`
-            max-w-(--max-content-width) min-w-(--min-content-width)
-            mx-auto px-4
-            lg:px-10
-          `}
-        >
-          <div
-            className={`
-              flex h-16 items-center justify-between
-              md:h-24
-            `}
-          >
-            <Link href="/" className="group flex items-center">
+        <div className="mx-auto min-w-(--min-content-width) max-w-(--max-content-width) px-4 lg:px-6 2xl:px-10">
+          <div className="flex h-16 items-center justify-between md:h-24">
+            <Link
+              href="/"
+              className="group flex items-center"
+              onClick={closeMenu}
+            >
               <Image
                 src={logoUrl ?? '/images/fallbacks/logo.png'}
                 alt="Grayson's Services logo"
                 width={1600}
                 height={413}
                 priority
-                className={`
-                  h-auto w-35
-                  transition-opacity duration-300
-                  group-hover:opacity-80
-                  md:w-45
-                `}
+                className="
+                  h-auto w-35 transition-opacity duration-300
+                  group-hover:opacity-80 md:w-45
+                "
               />
             </Link>
 
             {/* Mobile Hamburger */}
-            <div className="lg:hidden">
+            <div className="xl:hidden">
               <Hamburger
                 toggled={menuOpen}
                 toggle={setMenuOpen}
                 rounded
                 color="var(--color-white)"
-                label={
-                  menuOpen
-                    ? 'Close navigation menu'
-                    : 'Open navigation menu'
-                }
+                label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               />
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden items-center gap-10 px-5 lg:flex">
+            <nav className="hidden items-center gap-5 xl:flex 2xl:gap-8">
               {navItems.map((item) => (
                 <Link
-                  key={item.label}
+                  key={item.href}
                   href={item.href}
                   className="
-                    nav-link text-stone-pale/90 text-sm font-medium
-                    tracking-[0.08em] uppercase
+                    nav-link whitespace-nowrap text-xs font-medium
+                    tracking-[0.08em] text-stone-pale/90 uppercase
                     transition-colors duration-200 hover:text-white
+                    2xl:text-sm
                   "
                 >
                   {item.label}
@@ -116,19 +110,21 @@ export default function HeaderClient({
             </nav>
 
             {/* Desktop CTA */}
-            <div className="hidden items-center gap-8 lg:flex">
+            <div className="hidden shrink-0 items-center gap-6 xl:flex">
               <a
                 href="tel:+18123690711"
                 className="
-                  hidden text-sm font-medium tracking-wide text-gold
-                  transition-colors hover:text-gold
-                  min-[1275px]:block
+                  hidden whitespace-nowrap text-sm font-medium
+                  tracking-wide text-gold min-[1500px]:block
                 "
               >
                 (812) 369-0711
               </a>
 
-              <Link href="/contact" className="btn-primary max-h-14 text-xs">
+              <Link
+                href="/contact"
+                className="btn-primary max-h-14 shrink-0 whitespace-nowrap text-xs"
+              >
                 <span>Free Quote</span>
               </Link>
             </div>
@@ -136,11 +132,11 @@ export default function HeaderClient({
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
       <div
+        aria-hidden={!menuOpen}
         className={`
           fixed inset-0 z-40 flex flex-col overflow-y-auto
-          bg-stone-darkest transition-all duration-500
+          bg-stone-darkest transition-opacity duration-500
           ${
             menuOpen
               ? 'pointer-events-auto opacity-100'
@@ -151,9 +147,9 @@ export default function HeaderClient({
         <nav className="flex flex-1 flex-col gap-4 px-6 pt-30 pb-12">
           {navItems.map((item) => (
             <Link
-              key={item.label}
+              key={item.href}
               href={item.href}
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
               className="
                 border-b border-stone-dark pb-4
                 font-['Cormorant_Garamond'] text-4xl font-light text-white
@@ -176,7 +172,7 @@ export default function HeaderClient({
           <Link
             href="/contact"
             className="btn-primary self-start"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
           >
             <span>Get a Free Quote</span>
           </Link>

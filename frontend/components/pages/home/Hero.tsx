@@ -1,92 +1,114 @@
-import type { CompanyStats } from "@/features/company-stats/types";
-import ParallaxHero from "@/components/ui/parallax-hero";
-import { QuickStats } from "@/features/company-stats/types";
+import Link from 'next/link';
 
+import ParallaxHero from '@/components/ui/parallax-hero';
+import type { QuickStats } from '@/features/company-stats/types';
 
-type HeroClientProps = {
+type HeroProps = {
   quickStats: QuickStats | null;
 };
 
-
-
-export default function Hero({quickStats}: HeroClientProps) {
-  
-
-
+export default function Hero({ quickStats }: HeroProps) {
   return (
-    <section className="relative w-full h-screen min-h-[700px] max-h-[1100px] overflow-hidden flex items-end">
-      
-      {/* Background Image with Parallax */}
+    <section className="relative flex h-screen min-h-[700px] max-h-[1100px] w-full items-end overflow-hidden">
+      {/* Background */}
       <ParallaxHero
-        imageUrl = "/images/defaults/home/hero.jpg"
-        backgroundPosition = "center 0%"
+        imageUrl="/images/defaults/home/hero.jpg"
+        backgroundPosition="center 40%"
       />
 
-      {/* Readability Gradient Overlays */}
-      <div className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-black/80 via-black/40 to-transparent" />
-      <div className="absolute inset-0 bg-linear-to-t from-stone-darkest via-stone-darkest/40 to-transparent" />
-      <div className="absolute inset-0 bg-linear-to-r from-stone-darkest/70 via-stone-darkest/20 to-transparent" />
+      {/* Readability overlays */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-black/80 via-black/40 to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-linear-to-t from-stone-darkest via-stone-darkest/40 to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-linear-to-r from-stone-darkest/70 via-stone-darkest/20 to-transparent"
+      />
 
-      {/* Floating Quality Badge */}
+      {/* Floating quality badge */}
       {quickStats && (
-      <div className = "absolute left-1/2 -translate-x-1/2 h-full w-full max-w-(--max-content-width) min-w-(--min-content-width)">
-        <div className="absolute top-7/16 right-12 lg:right-24 float-badge hidden md:flex h-28 w-28 lg:h-36 lg:w-36 flex-col items-center justify-center rounded-full border border-gold/60 bg-stone-darkest/40 backdrop-blur-sm will-change-transform transform-gpu shadow-[0_0_0_1px_rgba(184,151,90,0.25)]">
-          <span className="font-['Cormorant_Garamond'] text-3xl lg:text-4xl font-light text-white leading-none">
-            {quickStats.years_in_business.value}+
-          </span>
-          <span className="mt-2 text-center text-[9px] lg:text-[10px] font-medium uppercase leading-tight tracking-[0.2em] text-gold">
-            Years<br />Experience
-          </span>
+        <div className="absolute left-1/2 h-full w-full min-w-(--min-content-width) max-w-(--max-content-width) -translate-x-1/2">
+          <div
+            className="
+              float-badge absolute top-7/16 right-12 hidden
+              h-28 w-28 transform-gpu flex-col items-center justify-center
+              rounded-full border border-gold/60 bg-stone-darkest/40
+              shadow-[0_0_0_1px_rgba(184,151,90,0.25)]
+              backdrop-blur-sm md:flex lg:right-24 lg:h-36 lg:w-36
+            "
+          >
+            <span className="font-['Cormorant_Garamond'] text-3xl leading-none font-light text-white lg:text-4xl">
+              {quickStats.years_in_business.value}+
+            </span>
+
+            <span className="mt-2 text-center text-[9px] leading-tight font-medium tracking-[0.2em] text-gold uppercase lg:text-[10px]">
+              Years
+              <br />
+              Experience
+            </span>
+          </div>
         </div>
-      </div>
       )}
 
-
-
-      {/* Main Content */}
-      <div className="relative z-10 w-full max-w-(--max-content-width) min-w-(--min-content-width) mx-auto px-6 lg:px-12 pb-30 lg:pb-28 lg:mb-10">
-        
-
+      {/* Main content */}
+      <div className="relative z-10 mx-auto mb-0 w-full min-w-(--min-content-width) max-w-(--max-content-width) px-6 pb-30 lg:mb-10 lg:px-12 lg:pb-28">
         {/* Eyebrow */}
-        <div className="flex items-center gap-4 mb-6" style={{ animation: 'hero-word-in 0.8s 0.1s both' }}>
-          <div className="w-6 md:w-10 h-px bg-gold" />
+        <div
+          className="mb-6 flex items-center gap-4"
+          style={{ animation: 'hero-word-in 0.8s 0.1s both' }}
+        >
           <span
-            className="text-xs tracking-[0.35em] uppercase text-gold font-medium"
-            
-          >
+            aria-hidden="true"
+            className="h-px w-6 bg-gold md:w-10"
+          />
+
+          <span className="text-xs font-medium tracking-[0.35em] text-gold uppercase">
             Hardscaping
           </span>
         </div>
 
-
         {/* Headline */}
-        <h1 className="font-['Cormorant_Garamond'] font-light text-white leading-[0.95] max-w-5xl">
-          <div className="overflow-hidden">
-            <span className="hero-word text-[clamp(52px,8vw,120px)]" style={{ animationDelay: '0.2s' }}>
+        <h1 className="max-w-5xl font-['Cormorant_Garamond'] leading-[0.95] font-light text-white">
+          <span className="block overflow-hidden">
+            <span
+              className="hero-word text-[clamp(52px,8vw,120px)]"
+              style={{ animationDelay: '0.2s' }}
+            >
               Crafting
-            </span>
-            {' '}
-            <span className="hero-word text-[clamp(52px,8vw,120px)] italic text-gold" style={{ animationDelay: '0.35s' }}>
+            </span>{' '}
+            <span
+              className="hero-word text-[clamp(52px,8vw,120px)] text-gold italic"
+              style={{ animationDelay: '0.35s' }}
+            >
               Outdoor
             </span>
-          </div>
-          <div className="overflow-hidden">
-            <span className="hero-word text-[clamp(52px,8vw,120px)]" style={{ animationDelay: '0.5s' }}>
+          </span>
+
+          <span className="block overflow-hidden">
+            <span
+              className="hero-word text-[clamp(52px,8vw,120px)]"
+              style={{ animationDelay: '0.5s' }}
+            >
               Spaces That Last
             </span>
-          </div>
+          </span>
         </h1>
 
-
-
-        {/* Subtext & CTA row */}
-        <div className="mt-5 lg:mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <a
-            href="/gallery"
-            className="btn-primary min-w-[230px] lg:w-1/4 lg:h-15 justify-center"
+        {/* Calls to action */}
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 lg:mt-10">
+          <Link
+            href="/projects"
+            className="btn-primary min-w-[230px] justify-center lg:h-15 lg:w-1/4"
           >
             <span>View Our Work</span>
+
             <svg
+              aria-hidden="true"
               width="14"
               height="14"
               viewBox="0 0 14 14"
@@ -101,46 +123,41 @@ export default function Hero({quickStats}: HeroClientProps) {
                 strokeLinejoin="round"
               />
             </svg>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/contact"
-            className="btn-outline justify-center lg:w-1/5 lg:h-15 min-w-[230px]"
+            className="btn-outline min-w-[230px] justify-center lg:h-15 lg:w-1/5"
           >
             <span>Free Estimate</span>
-          </a>
+          </Link>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll indicator */}
       <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        aria-hidden="true"
+        className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2"
         style={{ animation: 'hero-word-in 1s 1.2s both' }}
       >
-        <span className="text-[10px] tracking-[0.3em] uppercase text-white/80">Scroll</span>
-        <div className="w-px h-10 bg-linear-to-b from-gold to-transparent" />
+        <span className="text-[10px] tracking-[0.3em] text-white/80 uppercase">
+          Scroll
+        </span>
+
+        <span className="h-10 w-px bg-linear-to-b from-gold to-transparent" />
       </div>
 
-
-
-      {/* Bottom Stats Bar */}
+      {/* Bottom stats bar */}
       {quickStats && (
-      <div className = "absolute left-1/2 -translate-x-1/2 h-full w-full max-w-(--max-content-width) min-w-(--min-content-width)">
-        <div
-          className="absolute bottom-0 right-0 hidden lg:flex max-w-110 border-r border-gold/20"
-          style={{ animation: "hero-word-in 1s 1s both" }}
-        >
-          {quickStats &&
-            Object.values(quickStats).map((stat) => (
+        <div className="absolute left-1/2 h-full w-full min-w-(--min-content-width) max-w-(--max-content-width) -translate-x-1/2">
+          <div
+            className="absolute right-0 bottom-0 hidden max-w-110 border-r border-gold/20 lg:flex"
+            style={{ animation: 'hero-word-in 1s 1s both' }}
+          >
+            {Object.values(quickStats).map((stat) => (
               <div
                 key={stat.label}
-                className="
-                  w-44
-                  border-l border-t border-gold/20
-                  bg-stone-darkest/70
-                  px-6 py-5
-                  backdrop-blur-sm
-                "
+                className="w-44 border-t border-l border-gold/20 bg-stone-darkest/70 px-6 py-5 backdrop-blur-sm"
               >
                 <div className="font-['Cormorant_Garamond'] text-3xl font-semibold text-gold">
                   {stat.value}
@@ -152,10 +169,9 @@ export default function Hero({quickStats}: HeroClientProps) {
                 </div>
               </div>
             ))}
+          </div>
         </div>
-      </div>
       )}
-
     </section>
   );
 }

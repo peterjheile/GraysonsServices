@@ -1,35 +1,52 @@
-// components/pages/home/RevealObserver.tsx
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 
 type RevealObserverProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-export default function RevealObserver({ children }: RevealObserverProps) {
-  const ref = useRef<HTMLDivElement>(null);
+const REVEAL_SELECTOR =
+  '.reveal, .reveal-left, .reveal-right, .reveal-scale';
+
+export default function RevealObserver({
+  children,
+}: RevealObserverProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const elements = container.querySelectorAll(REVEAL_SELECTOR);
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
+          if (!entry.isIntersecting) {
+            return;
           }
+
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.12 },
+      {
+        threshold: 0.12,
+      },
     );
 
-    const els = ref.current?.querySelectorAll(
-      '.reveal, .reveal-left, .reveal-right, .reveal-scale',
-    );
+    elements.forEach((element) => {
+      observer.observe(element);
+    });
 
-    els?.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
-  return <div ref={ref}>{children}</div>;
+  return <div ref={containerRef}>{children}</div>;
 }

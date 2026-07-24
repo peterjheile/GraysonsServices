@@ -71,7 +71,7 @@ function ReviewerAvatar({
       >
         <Image
           src={review.profile_image_url}
-          alt={`${review.reviewer_name} profile`}
+          alt=""
           fill
           sizes={isLarge ? "40px" : "32px"}
           className="object-cover"
@@ -214,17 +214,22 @@ export default function Testimonials({
               </div>
 
               {/* Decorative side image */}
-              <div
-                className="reveal-right relative min-h-70 bg-cover bg-center lg:col-span-2"
-                style={{
-                  backgroundImage:
-                    "url('/services/after.jpg')",
-                }}
-              >
-                <div className="absolute inset-0 bg-gold/20" />
+              <div className="reveal-right relative min-h-70 overflow-hidden lg:col-span-2">
+                <Image
+                  src="/services/after.jpg"
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 40vw, calc(100vw - 48px)"
+                  className="object-cover object-center"
+                />
+
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gold/20"
+                />
 
                 <div className="absolute bottom-6 left-6 bg-stone-darkest/85 px-5 py-3 backdrop-blur-sm">
-                  <div className="text-[10px] font-medium uppercase tracking-[0.25em] text-gold">
+                  <div className="text-[10px] font-medium tracking-[0.25em] text-gold uppercase">
                     {averageRating.toFixed(1)}-Star Average
                   </div>
 
@@ -281,20 +286,20 @@ export default function Testimonials({
               }}
             >
               <div>
-                <div className="mb-4 font-['Cormorant_Garamond'] text-4xl font-light leading-tight text-stone-darkest">
+                <h3 className="mb-4 font-['Cormorant_Garamond'] text-4xl leading-tight font-light text-stone-darkest">
                   Ready to Start Your Project?
-                </div>
+                </h3>
 
                 <p className="text-sm font-light text-stone-darkest/70">
                   Join satisfied homeowners. Get your free estimate today.
                 </p>
               </div>
 
-              <a
-                href="#contact"
-                className="group mt-8 inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-darkest"
+              <Link
+                href="/contact"
+                className="group mt-8 inline-flex items-center gap-3 text-[11px] font-semibold tracking-[0.2em] text-stone-darkest uppercase"
               >
-                <span>Get a Quote</span>
+                <span>Request a Quote</span>
 
                 <svg
                   width="16"
@@ -312,7 +317,7 @@ export default function Testimonials({
                     strokeLinejoin="round"
                   />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

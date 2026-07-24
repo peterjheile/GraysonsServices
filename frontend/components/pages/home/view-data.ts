@@ -4,6 +4,7 @@ import type { ValueCard, AboutUs, CredCard, Testimonial } from "./view-types";
 
 export const ABOUT_US: AboutUs = {
     eyebrow: "Who We Are",
+    imageAlt: "Imagealt",
     titleLineNormal: "Your Outdoor Vision,",
     titleLineHighlight: "We Make It Happen",
     paragraphs: [
@@ -15,6 +16,13 @@ export const ABOUT_US: AboutUs = {
     ],
     url: `/images/defaults/home/about.jpg`
 }
+
+
+
+
+
+
+
 
 export const ABOUT_VALUES: [ValueCard, ValueCard, ValueCard, ValueCard] = [
     {
@@ -38,6 +46,10 @@ export const ABOUT_VALUES: [ValueCard, ValueCard, ValueCard, ValueCard] = [
         body: "We show up prepared, follow through on our promises, and work hard to deliver results our customers can trust.",
     },
 ];
+
+
+
+
 
 
 export const CRENTIAL_VALUES: [CredCard, CredCard, CredCard, CredCard] = [
@@ -69,45 +81,3 @@ export const CRENTIAL_VALUES: [CredCard, CredCard, CredCard, CredCard] = [
 
 
 
-export const TESTIMONIALS: Testimonial[] = [
-{
-    id: 1,
-    name: 'Billy (names here)',
-    role: 'Role goes here, such as: Homeowners, Bloomington',
-    stars: 5,
-    quote:
-      "Super Good Review will go here. One that is thought out from a client - maybe a trusted member of the community. This is the FEATURED review that will go here.",
-    project: 'Project Name in Gallery',
-    featured: true,
-  },
-  {
-    id: 2,
-    name: 'Billy Bob',
-    role: 'Role goes here, such as: Homeowners, Bloomington',
-    stars: 5,
-    quote:
-      'The review will go here. Again, ioptimally something well thought out, not too long and not too short. Many can go here.',
-    project: 'Project Name in Gallery',
-    featured: true,
-  },
-  {
-    id: 3,
-    name: 'Billy Bob',
-    role: 'Role goes here, such as: Homeowners, Bloomington',
-    stars: 5,
-    quote:
-      'The review will go here. Again, ioptimally something well thought out, not too long and not too short. Many can go here.',
-    project: 'Project Name in Gallery',
-    featured: true,
-  },
-  {
-    id: 4,
-    name: 'Billy Bob',
-    role: 'Role goes here, such as: Homeowners, Bloomington',
-    stars: 5,
-    quote:
-      'The review will go here. Again, ioptimally something well thought out, not too long and not too short. Many can go here.',
-    project: 'Project Name in Gallery',
-    featured: false,
-  },
-]

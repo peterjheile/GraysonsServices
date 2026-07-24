@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 
 from .models import ContactSubmission
 from .serializers import ContactSubmissionSerializer
-from .services import send_contact_notification
+from .services import send_contact_notification, send_contact_confirmation
 from .throttles import (
     ContactBurstThrottle,
     ContactDailyThrottle,
@@ -32,5 +32,13 @@ class ContactSubmissionCreateView(CreateAPIView):
         except Exception:
             logger.exception(
                 "Failed to send email for contact submission %s",
+                submission.pk,
+            )
+
+        try:
+            send_contact_confirmation(submission)
+        except Exception:
+            logger.exception(
+                "Failed to send contact confirmation for submission %s",
                 submission.pk,
             )

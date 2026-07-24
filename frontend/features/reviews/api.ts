@@ -1,41 +1,36 @@
-import "server-only";
+import 'server-only';
 
-import { z } from "zod";
+import { z } from 'zod';
 
 import {
   reviewsSchema,
   type Review,
   type ReviewFilters,
-} from "./types";
-
+} from './types';
 
 const DJANGO_API_URL = (
   process.env.DJANGO_API_URL ??
-  "http://127.0.0.1:8000"
-).replace(/\/$/, "");
+  'http://127.0.0.1:8000'
+).replace(/\/$/, '');
 
 const REVIEW_REVALIDATE_SECONDS = 300;
 
-
-function formatValidationError(
-  error: z.ZodError,
-): string {
+function formatValidationError(error: z.ZodError): string {
   return error.issues
     .map((issue) => {
       const path = issue.path.length
-        ? issue.path.join(".")
-        : "response";
+        ? issue.path.join('.')
+        : 'response';
 
       return `${path}: ${issue.message}`;
     })
-    .join("; ");
+    .join('; ');
 }
-
 
 async function fetchAndValidate<T>(
   path: string,
   schema: z.ZodType<T>,
-  cacheTags: string[],
+  cacheTags: string[]
 ): Promise<T> {
   const response = await fetch(
     `${DJANGO_API_URL}${path}`,
@@ -44,12 +39,12 @@ async function fetchAndValidate<T>(
         revalidate: REVIEW_REVALIDATE_SECONDS,
         tags: cacheTags,
       },
-    },
+    }
   );
 
   if (!response.ok) {
     throw new Error(
-      `Reviews API request failed: ${response.status} ${response.statusText}`,
+      `Reviews API request failed: ${response.status} ${response.statusText}`
     );
   }
 
@@ -57,78 +52,86 @@ async function fetchAndValidate<T>(
   const result = schema.safeParse(data);
 
   if (!result.success) {
+    console.error(
+      `Invalid Reviews API response from "${path}":`,
+      result.error.issues
+    );
+
     throw new Error(
       `Invalid Reviews API response: ${formatValidationError(
-        result.error,
-      )}`,
+        result.error
+      )}`
     );
   }
 
   return result.data;
 }
 
-
-function createReviewQuery(
-  filters?: ReviewFilters,
-): string {
+function createReviewQuery(filters?: ReviewFilters): string {
   if (!filters) {
-    return "";
+    return '';
   }
 
   const params = new URLSearchParams();
 
   if (filters.categorySlug) {
-    params.set(
-      "category",
-      filters.categorySlug,
-    );
+    params.set('category', filters.categorySlug);
   }
 
   if (filters.source) {
-    params.set(
-      "source",
-      filters.source,
-    );
+    params.set('source', filters.source);
   }
 
   const query = params.toString();
 
-  return query
-    ? `?${query}`
-    : "";
+  return query ? `?${query}` : '';
 }
-
 
 export async function getReviews(
-  filters?: ReviewFilters,
+  filters?: ReviewFilters
 ): Promise<Review[]> {
-  const query = createReviewQuery(filters);
+  try {
+    const query = createReviewQuery(filters);
 
-  return fetchAndValidate(
-    `/api/reviews/${query}`,
-    reviewsSchema,
-    [
-      "reviews",
-      filters?.categorySlug
-        ? `reviews-category-${filters.categorySlug}`
-        : "all-reviews",
-      filters?.source
-        ? `reviews-source-${filters.source}`
-        : "all-review-sources",
-    ],
-  );
+    return await fetchAndValidate(
+      `/api/reviews/${query}`,
+      reviewsSchema,
+      [
+        'reviews',
+        filters?.categorySlug
+          ? `reviews-category-${filters.categorySlug}`
+          : 'all-reviews',
+        filters?.source
+          ? `reviews-source-${filters.source}`
+          : 'all-review-sources',
+      ]
+    );
+  } catch (error) {
+    console.error(
+      'Unable to load reviews; returning an empty list.',
+      error
+    );
+
+    return [];
+  }
 }
 
+export async function getHomepageReviews(): Promise<Review[]> {
+  try {
+    return await fetchAndValidate(
+      '/api/reviews/homepage/',
+      reviewsSchema,
+      [
+        'reviews',
+        'homepage-reviews',
+      ]
+    );
+  } catch (error) {
+    console.error(
+      'Unable to load homepage reviews; returning an empty list.',
+      error
+    );
 
-export async function getHomepageReviews(): Promise<
-  Review[]
-> {
-  return fetchAndValidate(
-    "/api/reviews/homepage/",
-    reviewsSchema,
-    [
-      "reviews",
-      "homepage-reviews",
-    ],
-  );
+    return [];
+  }
 }

@@ -1,13 +1,15 @@
 import Header from "@/components/layout/Header"
 import Hero from '@/components/pages/home/Hero'
 import MarqueeStrip from '@/components/pages/home/MarqueeStrip';
-import About from '@/components/pages/home/About';
 import Gallery from '@/components/pages/home/Gallery';
 import Testimonials from '@/components//pages/home/Testimonials';
 import Contact from '@/components/pages/home/Contact';
 import Footer from '@/components/layout/Footer';
+import About from '@/components/pages/home/About';
+import Credentials from '@/components/pages/home/Credentials';
+import Values from '@/components/pages/home/Values';
 
-import { ABOUT_VALUES, ABOUT_US, CRENTIAL_VALUES, TESTIMONIALS } from "@/components/pages/home/view-data";
+import { ABOUT_VALUES, ABOUT_US, CRENTIAL_VALUES } from "@/components/pages/home/view-data";
 
 import { createQuickStats } from '@/features/company-stats/utils'
 
@@ -24,36 +26,35 @@ export default async function Home() {
   const serviceNames = await getServiceNames();
   const testimonials = await getHomepageReviews();
 
+
   const quickStats = createQuickStats(companyStats);
   
-
-
-
 
   return (
     <main className="grain overflow-x-hidden">
       <Header />
-      <Hero quickStats = {quickStats} />
+      <Hero quickStats={quickStats} />
 
       {serviceNames.length > 3 && (
         <MarqueeStrip services={serviceNames} />
       )}
 
-
-      <About 
-        values = {ABOUT_VALUES}
-        about = {ABOUT_US}
-        credentials={CRENTIAL_VALUES}
-        quickStats = {quickStats}
+      <About
+        about={ABOUT_US}
+        quickStats={quickStats}
       />
+
+      <Values values={ABOUT_VALUES} />
+
+      <Credentials credentials={CRENTIAL_VALUES} />
 
       <Gallery images={projectImages} />
 
-      
-      <Testimonials testimonials = {testimonials}/>
+      <Testimonials testimonials={testimonials} />
+
       <Contact />
+
       <Footer />
-     
     </main>
   );
 }

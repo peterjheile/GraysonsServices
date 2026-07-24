@@ -1,0 +1,7 @@
+Hi {{ submission.first_name }},
+
+Thank you for contacting Grayson's Services. We received your message and will get back to you as soon as possible.
+
+If you need to add anything, you can reply directly to this email.
+
+— Grayson's Services

@@ -8,5 +8,6 @@ class ServiceNameSerializer(serializers.ModelSerializer):
         model = Service
         fields = (
             "name",
+            "slug",
         )
         read_only_fields = fields
