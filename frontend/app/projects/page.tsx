@@ -28,7 +28,7 @@ export default async function ProjectsPage() {
     <>
       <Header />
 
-      <main className="grain">
+      <main className="grain overflow-x-clip">
         <ProjectsHero />
         <ProjectsSection
           projects={projects}
