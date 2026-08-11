@@ -31,6 +31,6 @@ export const CULTURE_CONTENT = {
 export const CULTURE_IMAGES = [
   '/services/d8.jpg',
   '/services/RetainingWall1.jpg',
-  '/services/retainingWall2.jpg',
+  '/services/RetainingWall2.jpg',
   '/services/Walkway1.jpg',
 ] as const;

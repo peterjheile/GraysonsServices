@@ -18,14 +18,18 @@ export default async function CareersPage() {
   const jobPostings = await fetchJobPostings().catch(() => []);
 
   return (
-    <main className="grain overflow-x-clip">
+    <>
       <Header />
-      <CareersHero />
-      <CultureSection />
-      <JobBoard jobPostings={jobPostings} />
-      <PerksGrid />
-      <CareersCTA />
+
+      <main className="grain overflow-x-clip">
+        <CareersHero />
+        <CultureSection />
+        <JobBoard jobPostings={jobPostings} />
+        <PerksGrid />
+        <CareersCTA />
+      </main>
+
       <Footer />
-    </main>
+    </>
   );
 }

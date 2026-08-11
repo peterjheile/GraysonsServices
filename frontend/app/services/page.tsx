@@ -22,9 +22,13 @@ export default async function ServicesPage() {
       <main className="grain">
         <ServicesHero />
 
-        {services.length > 0 && <ServicesNav services={serviceNavItems} />}
+        <div>
+          {services.length > 0 && (
+            <ServicesNav services={serviceNavItems} />
+          )}
 
-        <ServicesGrid services={services} />
+          <ServicesGrid services={services} />
+        </div>
         <ProcessSection />
       </main>
 
