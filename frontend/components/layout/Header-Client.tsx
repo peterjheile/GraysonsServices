@@ -5,43 +5,87 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Hamburger from 'hamburger-react';
 
-import type { NavItem } from './view-types';
+import type { NavItem } from './view-data';
 
 type HeaderClientProps = {
-  navItems: NavItem[];
+  navItems: readonly NavItem[];
   logoUrl: string | null;
+  businessName: string;
+  phone: string | null;
+  phoneHref: string | null;
 };
 
 export default function HeaderClient({
   navItems,
   logoUrl,
+  businessName,
+  phone,
+  phoneHref,
 }: HeaderClientProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    let animationFrame: number | null = null;
+    let wasScrolled = false;
+
+    const updateScrolledState = () => {
+      animationFrame = null;
+
+      const isScrolled = window.scrollY > 40;
+
+      if (isScrolled !== wasScrolled) {
+        wasScrolled = isScrolled;
+        setScrolled(isScrolled);
+      }
+    };
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
+      if (animationFrame === null) {
+        animationFrame = window.requestAnimationFrame(updateScrolledState);
+      }
     };
 
     handleScroll();
-
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+      }
     };
   }, []);
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-
-    if (menuOpen) {
-      document.body.style.overflow = 'hidden';
+    if (!menuOpen) {
+      return;
     }
+
+    const previousOverflow = document.body.style.overflow;
+    const desktopQuery = window.matchMedia('(min-width: 80rem)');
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+
+    const handleDesktopChange = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+    desktopQuery.addEventListener('change', handleDesktopChange);
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+      desktopQuery.removeEventListener('change', handleDesktopChange);
     };
   }, [menuOpen]);
 
@@ -60,7 +104,7 @@ export default function HeaderClient({
           }
         `}
       >
-        <div className="mx-auto min-w-(--min-content-width) max-w-(--max-content-width) px-4 lg:px-6 2xl:px-10">
+        <div className="mx-auto max-w-(--max-content-width) px-4 lg:px-6 2xl:px-10">
           <div className="flex h-16 items-center justify-between md:h-24">
             <Link
               href="/"
@@ -68,11 +112,12 @@ export default function HeaderClient({
               onClick={closeMenu}
             >
               <Image
-                src={logoUrl ?? '/images/fallbacks/logo.png'}
-                alt="Grayson's Services logo"
+                src={logoUrl || '/images/fallbacks/logo.png'}
+                alt={`${businessName} home`}
                 width={1600}
                 height={413}
-                priority
+                sizes="(min-width: 768px) 180px, 140px"
+                loading="eager"
                 className="
                   h-auto w-35 transition-opacity duration-300
                   group-hover:opacity-80 md:w-45
@@ -80,19 +125,24 @@ export default function HeaderClient({
               />
             </Link>
 
-            {/* Mobile Hamburger */}
             <div className="xl:hidden">
               <Hamburger
                 toggled={menuOpen}
                 toggle={setMenuOpen}
                 rounded
                 color="var(--color-white)"
-                label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                label={
+                  menuOpen
+                    ? 'Close navigation menu'
+                    : 'Open navigation menu'
+                }
               />
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden items-center gap-5 xl:flex 2xl:gap-8">
+            <nav
+              aria-label="Primary navigation"
+              className="hidden items-center gap-5 xl:flex 2xl:gap-8"
+            >
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -109,17 +159,18 @@ export default function HeaderClient({
               ))}
             </nav>
 
-            {/* Desktop CTA */}
             <div className="hidden shrink-0 items-center gap-6 xl:flex">
-              <a
-                href="tel:+18123690711"
-                className="
-                  hidden whitespace-nowrap text-sm font-medium
-                  tracking-wide text-gold min-[1500px]:block
-                "
-              >
-                (812) 369-0711
-              </a>
+              {phone && phoneHref && (
+                <a
+                  href={phoneHref}
+                  className="
+                    hidden whitespace-nowrap text-sm font-medium
+                    tracking-wide text-gold min-[1500px]:block
+                  "
+                >
+                  {phone}
+                </a>
+              )}
 
               <Link
                 href="/contact"
@@ -133,10 +184,11 @@ export default function HeaderClient({
       </header>
 
       <div
+        inert={!menuOpen}
         aria-hidden={!menuOpen}
         className={`
           fixed inset-0 z-40 flex flex-col overflow-y-auto
-          bg-stone-darkest transition-opacity duration-500
+          bg-stone-darkest transition-opacity duration-500 xl:hidden
           ${
             menuOpen
               ? 'pointer-events-auto opacity-100'
@@ -144,7 +196,10 @@ export default function HeaderClient({
           }
         `}
       >
-        <nav className="flex flex-1 flex-col gap-4 px-6 pt-30 pb-12">
+        <nav
+          aria-label="Mobile navigation"
+          className="flex flex-1 flex-col gap-4 px-6 pt-30 pb-12"
+        >
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -162,12 +217,14 @@ export default function HeaderClient({
         </nav>
 
         <div className="flex flex-col gap-4 px-8 pb-12">
-          <a
-            href="tel:+18123690711"
-            className="text-sm tracking-widest text-gold uppercase"
-          >
-            (812) 369-0711
-          </a>
+          {phone && phoneHref && (
+            <a
+              href={phoneHref}
+              className="text-sm tracking-widest text-gold uppercase"
+            >
+              {phone}
+            </a>
+          )}
 
           <Link
             href="/contact"

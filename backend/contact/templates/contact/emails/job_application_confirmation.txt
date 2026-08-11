@@ -1,0 +1,18 @@
+Hi {{ application.first_name }},
+
+Thank you for applying to Grayson's Services. We received your application for {{ job_posting.title }} and will review it personally.
+
+APPLICATION SUMMARY
+
+Role: {{ job_posting.title }}
+Category: {{ job_posting.category.name }}
+Location: {{ job_posting.location }}
+Employment type: {{ job_posting.get_employment_type_display }}
+Pay range: {{ pay_range_label }}
+Resume: {% if resume_uploaded %}Received{% else %}Not provided{% endif %}
+
+If your experience aligns with the role, a member of our team will contact you about next steps. Submitting an application does not guarantee an interview or employment.
+
+If you need to correct or add anything, reply to this email.
+
+Grayson's Services

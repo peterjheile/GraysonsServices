@@ -1,15 +1,20 @@
 from pathlib import Path
 
-from decouple import config
+from decouple import AutoConfig
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+env = AutoConfig(search_path=BASE_DIR)
 
 
-SECRET_KEY = config("SECRET_KEY")
+def _path_setting(name, default):
+    value = env(name, default="").strip()
+    return Path(value) if value else Path(default)
 
+
+# Environment-specific settings override these safe base values.
+SECRET_KEY = ""
 DEBUG = False
-
 ALLOWED_HOSTS: list[str] = []
 
 
@@ -30,7 +35,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
-    "anymail"
+    "anymail",
 ]
 
 LOCAL_APPS = [
@@ -38,7 +43,8 @@ LOCAL_APPS = [
     "services",
     "projects",
     "reviews",
-    "contact"
+    "contact",
+    "careers",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -59,7 +65,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -75,17 +80,8 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
-
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -117,22 +113,35 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "America/Indiana/Indianapolis"
-
 USE_I18N = True
 USE_TZ = True
 
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_ROOT = _path_setting(
+    "STATIC_ROOT",
+    BASE_DIR / "staticfiles",
 )
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = _path_setting(
+    "MEDIA_ROOT",
+    BASE_DIR / "media",
+)
+PRIVATE_MEDIA_ROOT = _path_setting(
+    "PRIVATE_MEDIA_ROOT",
+    BASE_DIR / "private_media",
+)
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -154,20 +163,12 @@ UNFOLD = {
 }
 
 
-
-
-
+# Development and production supply their own email values.
 ANYMAIL = {
-    "RESEND_API_KEY": config(
-        "RESEND_API_KEY",
-        default="",
-    ),
+    "RESEND_API_KEY": "",
 }
-
-DEFAULT_FROM_EMAIL = config(
-    "DEFAULT_FROM_EMAIL",
-)
-
-CONTACT_NOTIFICATION_EMAIL = config(
-    "CONTACT_NOTIFICATION_EMAIL",
-)
+DEFAULT_FROM_EMAIL = "webmaster@localhost"
+CONTACT_NOTIFICATION_EMAIL = ""
+QUOTE_NOTIFICATION_EMAIL = ""
+CAREERS_NOTIFICATION_EMAIL = ""
+EMAIL_TIMEOUT = 10

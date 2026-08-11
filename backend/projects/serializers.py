@@ -3,118 +3,114 @@ from rest_framework import serializers
 from .models import Project, ProjectImage
 
 
-class ProjectReferenceSerializer(serializers.ModelSerializer):
-    """
-    Lightweight project information nested inside a homepage image.
-    """
+class ProjectImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
 
-    category = serializers.CharField(
-        source="category.name",
+    class Meta:
+        model = ProjectImage
+        fields = (
+            "id",
+            "image_url",
+            "alt_text",
+            "caption",
+            "role",
+            "is_cover",
+            "display_order",
+        )
+
+    def get_image_url(self, obj):
+        if not obj.image:
+            return None
+
+        request = self.context.get("request")
+
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+
+        return obj.image.url
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    category = serializers.SerializerMethodField()
+    category_slug = serializers.SerializerMethodField()
+
+    images = ProjectImageSerializer(
+        many=True,
         read_only=True,
     )
 
-    category_slug = serializers.CharField(
-        source="category.slug",
-        read_only=True,
-    )
+    cover_image = serializers.SerializerMethodField()
+    materials = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
         fields = (
             "id",
-            "title",
             "slug",
+            "title",
+            "caption",
             "category",
             "category_slug",
+            "is_featured",
+            "is_published",
+            "display_order",
+
+            # Featured-project details
             "location",
+            "completion_year",
+            "duration",
+            "area",
+            "challenge",
+            "approach",
+            "result",
+            "materials",
+
+            # Images
+            "cover_image",
+            "images",
         )
 
+    def get_category(self, obj):
+        if not obj.category:
+            return None
 
-class HomepageProjectImageSerializer(serializers.ModelSerializer):
-    """
-    Images selected for the homepage masonry gallery.
-    """
+        return obj.category.name
 
-    image_url = serializers.ImageField(
-        source="image",
-        read_only=True,
-    )
+    def get_category_slug(self, obj):
+        if not obj.category:
+            return None
 
-    project = ProjectReferenceSerializer(
-        read_only=True,
-    )
+        return obj.category.slug
 
-    class Meta:
-        model = ProjectImage
-        fields = (
-            "id",
-            "image_url",
-            "alt_text",
-            "caption",
-            "image_type",
-            "is_cover",
-            "show_on_homepage",
-            "homepage_order",
-            "homepage_size",
-            "display_order",
-            "project",
-        )
+    def get_materials(self, obj):
+        return obj.materials_list
+
+    def get_cover_image(self, obj):
+        cover_image = obj.cover_image
+
+        if not cover_image:
+            return None
+
+        return ProjectImageSerializer(
+            cover_image,
+            context=self.context,
+        ).data
 
 
-class ProjectCardImageSerializer(serializers.ModelSerializer):
-    """
-    Small image representation used for project cards.
-    """
-
-    image_url = serializers.ImageField(
-        source="image",
-        read_only=True,
-    )
-
-    class Meta:
-        model = ProjectImage
-        fields = (
-            "id",
-            "image_url",
-            "alt_text",
-        )
 
 
-class ProjectImageSerializer(serializers.ModelSerializer):
-    """
-    Complete image information for a project detail or case-study view.
-    """
-
-    image_url = serializers.ImageField(
-        source="image",
-        read_only=True,
-    )
-
-    class Meta:
-        model = ProjectImage
-        fields = (
-            "id",
-            "image_url",
-            "alt_text",
-            "caption",
-            "image_type",
-            "is_cover",
-            "display_order",
-        )
-
-
-class ProjectCardSerializer(serializers.ModelSerializer):
-    """
-    Lightweight project representation for the regular Projects grid.
-    """
-
+class HomepageFeaturedProjectSerializer(
+    serializers.ModelSerializer
+):
     category = serializers.CharField(
         source="category.name",
+        allow_null=True,
         read_only=True,
     )
 
     category_slug = serializers.CharField(
         source="category.slug",
+        allow_null=True,
         read_only=True,
     )
 
@@ -123,93 +119,22 @@ class ProjectCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = (
-            "id",
-            "title",
             "slug",
+            "title",
             "category",
             "category_slug",
             "location",
-            "completion_year",
-            "short_description",
-            "is_featured",
-            "featured_order",
-            "display_order",
+            "homepage_size",
             "cover_image",
         )
 
     def get_cover_image(self, obj):
-        images = list(obj.images.all())
+        cover_image = obj.cover_image
 
-        cover_image = next(
-            (image for image in images if image.is_cover),
-            None,
-        )
-
-        # Fall back to the first image if no cover was selected.
-        if cover_image is None and images:
-            cover_image = images[0]
-
-        if cover_image is None:
+        if not cover_image:
             return None
 
-        return ProjectCardImageSerializer(
+        return ProjectImageSerializer(
             cover_image,
             context=self.context,
         ).data
-
-
-class ProjectDetailSerializer(serializers.ModelSerializer):
-    """
-    Complete project information for featured case studies and detail pages.
-    """
-
-    category = serializers.CharField(
-        source="category.name",
-        read_only=True,
-    )
-
-    category_slug = serializers.CharField(
-        source="category.slug",
-        read_only=True,
-    )
-
-    materials = serializers.SerializerMethodField()
-
-    images = ProjectImageSerializer(
-        many=True,
-        read_only=True,
-    )
-
-    class Meta:
-        model = Project
-        fields = (
-            "id",
-            "title",
-            "slug",
-            "category",
-            "category_slug",
-            "location",
-            "completion_year",
-            "short_description",
-            "duration",
-            "area",
-            "challenge",
-            "approach",
-            "result",
-            "materials",
-            "is_featured",
-            "featured_order",
-            "display_order",
-            "images",
-            "updated_at",
-        )
-
-    def get_materials(self, obj):
-        if not obj.materials:
-            return []
-
-        return [
-            material.strip()
-            for material in obj.materials.splitlines()
-            if material.strip()
-        ]

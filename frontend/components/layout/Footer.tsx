@@ -179,18 +179,18 @@ export default async function Footer() {
 
           <div className="flex items-center gap-5">
             <Link
-              href="/privacy"
+              href="/privacy-policy"
               className="text-[11px] text-stone-pale/40 transition-colors hover:text-stone-pale/70"
             >
               Privacy Policy
             </Link>
 
-            <Link
+            <a
               href="/sitemap.xml"
               className="text-[11px] text-stone-pale/40 transition-colors hover:text-stone-pale/70"
             >
               Sitemap
-            </Link>
+            </a>
           </div>
         </div>
       </div>

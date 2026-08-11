@@ -4,25 +4,26 @@ import Footer from '@/components/layout/Footer';
 import CareersHero from '@/components/pages/careers/CareersHero';
 import CultureSection from '@/components/pages/careers/CultureSection';
 import PerksGrid from '@/components/pages/careers/PerksGrid';
-import GrowthPath from '@/components/pages/careers/GrowthPath';
 import JobBoard from '@/components/pages/careers/JobBoard';
 import CareersCTA from '@/components/pages/careers/CareersCTA';
+import { fetchJobPostings } from '@/features/careers/api';
 
 export const metadata: Metadata = {
   title: "Careers | Grayson's Services",
   description:
-    "Join the Grayson's Services team — hardscaping careers in the Greater Ohio Region. View open positions in field operations, project management, and design. Competitive pay, real growth paths, full benefits.",
+    "Explore career opportunities with Grayson's Services. View current openings and learn about our hands-on team, work environment, and opportunities to grow.",
 };
 
-export default function CareersPage() {
+export default async function CareersPage() {
+  const jobPostings = await fetchJobPostings().catch(() => []);
+
   return (
-    <main className="grain">
+    <main className="grain overflow-x-clip">
       <Header />
       <CareersHero />
       <CultureSection />
+      <JobBoard jobPostings={jobPostings} />
       <PerksGrid />
-      {/* <GrowthPath /> */}
-      <JobBoard />
       <CareersCTA />
       <Footer />
     </main>

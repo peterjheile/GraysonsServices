@@ -2,48 +2,97 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const metrics = [
-  {
-    value: 0,
-    suffix: '+',
-    label: 'Verified Reviews',
-    sub: 'Across Google & Facebook',
-  },
-  {
-    value: 0,
-    suffix: '',
-    label: 'Average Star Rating',
-    sub: 'Out of 5.0 across all platforms',
-    decimal: true,
-  },
-  {
-    value: 100,
-    suffix: '%',
-    label: 'Would Re-hire',
-    sub: 'Based on post-project surveys',
-  },
-  {
-    value: 0,
-    suffix: '+',
-    label: 'Projects Completed',
-    sub: 'Since 2009',
-  },
-];
+import type { CompanyStats } from '@/features/company-stats/types';
+import type { Review } from '@/features/reviews/types';
+
+type TrustBarProps = {
+  readonly reviews: readonly Review[];
+  readonly companyStats: CompanyStats | null;
+};
+
+type Metric = Readonly<{
+  value: number;
+  suffix: string;
+  label: string;
+  sub: string;
+  decimal?: boolean;
+}>;
+
+function getAverageRating(reviews: readonly Review[]): number {
+  if (reviews.length === 0) {
+    return 0;
+  }
+
+  return (
+    reviews.reduce((total, review) => total + review.rating, 0) /
+    reviews.length
+  );
+}
+
+function createMetrics(
+  reviews: readonly Review[],
+  companyStats: CompanyStats | null,
+): readonly Metric[] {
+  const reviewMetrics: readonly Metric[] = [
+    {
+      value: reviews.length,
+      suffix: '',
+      label: 'Published Reviews',
+      sub: 'Customer feedback shared on this site',
+    },
+    {
+      value: getAverageRating(reviews),
+      suffix: '',
+      label: 'Average Star Rating',
+      sub:
+        reviews.length > 0
+          ? 'Across published customer reviews'
+          : 'No published ratings yet',
+      decimal: true,
+    },
+  ];
+
+  if (companyStats === null) {
+    return reviewMetrics;
+  }
+
+  return [
+    ...reviewMetrics,
+    {
+      value: companyStats.projects_completed,
+      suffix: '+',
+      label: 'Projects Completed',
+      sub: 'Across completed customer projects',
+    },
+  ];
+}
 
 function useCountUp(target: number, duration = 1600, active = false, decimal = false) {
   const [val, setVal] = useState(0);
+
   useEffect(() => {
     if (!active) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setVal(target);
+      return;
+    }
+
     const start = performance.now();
+    let animationFrame = 0;
+
     const tick = (now: number) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setVal(decimal ? Math.round(target * eased * 10) / 10 : Math.round(target * eased));
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) animationFrame = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+
+    animationFrame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrame);
   }, [active, target, duration, decimal]);
+
   return val;
 }
 
@@ -62,16 +111,24 @@ function CountMetric({ value, suffix, label, sub, decimal = false, active }: {
   );
 }
 
-export default function TrustBar() {
-  const ref = useRef<HTMLDivElement>(null);
+export default function TrustBar({
+  reviews,
+  companyStats,
+}: TrustBarProps) {
+  const ref = useRef<HTMLElement>(null);
   const [active, setActive] = useState(false);
+  const metrics = createMetrics(reviews, companyStats);
+  const yearsInBusiness =
+    companyStats !== null && companyStats.years_in_business > 0
+      ? companyStats.years_in_business
+      : null;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setActive(true);
-          ref.current?.querySelectorAll('.reveal').forEach((el) => el.classList.add('visible'));
+          observer.disconnect();
         }
       },
       { threshold: 0.3 }
@@ -97,27 +154,35 @@ export default function TrustBar() {
         <div className="reveal text-center mb-14">
           <span className="text-[11px] tracking-[0.35em] uppercase text-[#b8975a] font-medium">The Numbers</span>
           <h2 className="font-['Cormorant_Garamond'] text-[clamp(28px,3.5vw,44px)] font-light text-[#faf8f5] mt-3">
-            Earned Over 15 Years of Work
+            {yearsInBusiness === null
+              ? 'Earned Through Years of Work'
+              : `Earned Over ${yearsInBusiness.toLocaleString()} ${
+                  yearsInBusiness === 1 ? 'Year' : 'Years'
+                } of Work`}
           </h2>
         </div>
 
         {/* Metrics grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-[#2d2926]">
-          {metrics.map((m, i) => (
+        <div
+          className={`grid divide-y divide-[#2d2926] sm:divide-x sm:divide-y-0 ${
+            metrics.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+          }`}
+        >
+          {metrics.map((m) => (
             <CountMetric key={m.label} {...m} active={active} />
           ))}
         </div>
 
-        {/* Bottom guarantee strip */}
+        {/* Service expectations */}
         <div className="mt-16 pt-10 border-t border-[#2d2926] grid sm:grid-cols-3 gap-6 reveal">
           {[
-            { icon: '✦', label: 'Free Estimates', detail: 'No cost, no obligation — ever' },
-            { icon: '✦', label: 'Gauntee of Some Sort', detail: 'On all hardscaping installations' },
-            { icon: '✦', label: '48-Hour Response', detail: 'We follow up on every inquiry' },
+            { icon: '✦', label: 'Free Estimates', detail: 'Straightforward project consultations' },
+            { icon: '✦', label: '48-Hour Response', detail: 'We aim to follow up within 48 hours' },
+            { icon: '✦', label: 'Clear Communication', detail: 'Helpful updates from start to finish' },
           ].map((g) => (
-            <div key={g.label} className="flex items-start gap-4">
-              <span className="text-[#b8975a] text-lg leading-none mt-0.5">{g.icon}</span>
-              <div>
+            <div key={g.label} className="flex flex-col items-center gap-2 px-4 text-center">
+              <span className="text-lg leading-none text-[#b8975a]" aria-hidden="true">{g.icon}</span>
+              <div className="flex flex-col items-center">
                 <div className="text-sm font-semibold text-[#faf8f5] tracking-wide">{g.label}</div>
                 <div className="text-[11px] text-[#5c5550] mt-0.5">{g.detail}</div>
               </div>

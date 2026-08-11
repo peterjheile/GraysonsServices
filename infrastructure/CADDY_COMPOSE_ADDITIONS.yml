@@ -1,0 +1,19 @@
+# Merge these declarations into the EXISTING infrastructure Compose file.
+# This is intentionally not a standalone Compose stack.
+
+services:
+  caddy:
+    volumes:
+      - graysons_services_public_media:/srv/graysons-services/media:ro
+    networks:
+      - caddy_proxy
+
+networks:
+  caddy_proxy:
+    external: true
+    name: REPLACE_WITH_EXISTING_CADDY_NETWORK
+
+volumes:
+  graysons_services_public_media:
+    external: true
+    name: graysons-services-public-media

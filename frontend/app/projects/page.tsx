@@ -1,26 +1,43 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import ProjectsHero from '@/components/pages/projects/ProjectsHero';
-import ProjectsGrid from '@/components/pages/projects/ProjectsGrid';
-import TransformationStrip from '@/components/pages/projects/TransformationStrip';
-import ProjectsCTA from '@/components/pages/projects/ProjectsCTA';
 import type { Metadata } from 'next';
 
+import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
+import ProjectsCTA from '@/components/pages/projects/ProjectsCTA';
+import ProjectsHero from '@/components/pages/projects/ProjectsHero';
+import ProjectsSection from '@/components/pages/projects/ProjectsSection';
+
+import {
+  getFeaturedProjects,
+  getProjects,
+} from '@/features/projects/api';
+import TransformationStrip from '@/components/pages/projects/TransformationStrip';
+
 export const metadata: Metadata = {
-  title: "Our Projects | Grayson's Services",
+  title: "Projects | Grayson's Services",
   description:
-    'Browse 500+ completed hardscaping projects — patios, retaining walls, outdoor kitchens, driveways, and more. See before and after comparisons across the Greater Ohio Region.',
+    "Explore completed outdoor projects from Grayson's Services, including decks, walkways, driveways, landscaping, drainage, and exterior improvements.",
 };
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const [projects, featuredProjects] = await Promise.all([
+    getProjects(),
+    getFeaturedProjects(),
+  ]);
+
   return (
-    <main className="grain overflow-hidden">
+    <>
       <Header />
-      <ProjectsHero />
-      <ProjectsGrid />
-      {/* <TransformationStrip /> */}
-      {/* <ProjectsCTA /> */}
-      {/* <Footer /> */}
-    </main>
+
+      <main className="grain">
+        <ProjectsHero />
+        <ProjectsSection
+          projects={projects}
+          featuredProjects={featuredProjects}
+        />
+        <ProjectsCTA />
+      </main>
+
+      <Footer />
+    </>
   );
 }

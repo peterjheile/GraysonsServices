@@ -1,147 +1,176 @@
+from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, StackedInline
 
 from .models import Project, ProjectImage
 
 
+class ProjectImageInlineFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+
+        active_forms = [
+            form
+            for form in self.forms
+            if form.cleaned_data
+            and not form.cleaned_data.get("DELETE", False)
+            and form.cleaned_data.get("image")
+        ]
+        image_count = len(active_forms)
+        if image_count == 0:
+            raise ValidationError(
+                "Every project must have at least one image."
+            )
+        if self.instance.is_featured and image_count < 3:
+            raise ValidationError(
+                "Featured projects must have at least three images."
+            )
+
+        cover_count = sum(
+            bool(form.cleaned_data.get("is_cover"))
+            for form in active_forms
+        )
+        before_count = sum(
+            form.cleaned_data.get("role") == ProjectImage.Role.BEFORE
+            for form in active_forms
+        )
+        after_count = sum(
+            form.cleaned_data.get("role") == ProjectImage.Role.AFTER
+            for form in active_forms
+        )
+        if cover_count > 1:
+            raise ValidationError(
+                "A project can only have one cover image."
+            )
+        if before_count > 1:
+            raise ValidationError(
+                "A project can only have one before image."
+            )
+        if after_count > 1:
+            raise ValidationError(
+                "A project can only have one after image."
+            )
+        if before_count != after_count:
+            raise ValidationError(
+                "A before-and-after comparison requires both a before "
+                "image and an after image."
+            )
+
+    def save_new(self, form, commit=True):
+        form.instance._skip_image_set_validation = True
+        try:
+            return super().save_new(form, commit=commit)
+        finally:
+            form.instance._skip_image_set_validation = False
+
+    def save_existing(self, form, instance, commit=True):
+        instance._skip_image_set_validation = True
+        try:
+            return super().save_existing(form, instance, commit=commit)
+        finally:
+            instance._skip_image_set_validation = False
+
+    def delete_existing(self, obj, commit=True):
+        obj._skip_image_set_validation = True
+        try:
+            return super().delete_existing(obj, commit=commit)
+        finally:
+            obj._skip_image_set_validation = False
+
+
 class ProjectImageInline(StackedInline):
     model = ProjectImage
-    extra = 0
+    formset = ProjectImageInlineFormSet
+    extra = 1
     show_change_link = True
-
     fields = (
-        "image",
         "image_preview",
+        "image",
         "alt_text",
         "caption",
-        "image_type",
+        "role",
         "is_cover",
         "display_order",
-        "show_on_homepage",
-        "homepage_order",
-        "homepage_size",
     )
+    readonly_fields = ("image_preview",)
+    ordering = ("display_order", "id")
 
-    readonly_fields = (
-        "image_preview",
-    )
-
-    ordering = (
-        "display_order",
-        "id",
-    )
-
-    @admin.display(description="Current Image")
+    @admin.display(description="Current image")
     def image_preview(self, obj):
-        if not obj or not obj.image:
-            return "No image uploaded"
-
+        if not obj.pk or not obj.image:
+            return "Upload an image to see its preview."
         return format_html(
-            """
-            <img
-                src="{}"
-                alt="{}"
-                style="
-                    width: 240px;
-                    height: 160px;
-                    object-fit: cover;
-                    border-radius: 6px;
-                "
-            />
-            """,
+            '<img src="{}" alt="{}" style="width:240px;height:160px;'
+            'object-fit:cover;border-radius:8px;">',
             obj.image.url,
-            obj.alt_text or obj.project.title,
+            obj.alt_text or "",
         )
 
 
 @admin.register(Project)
 class ProjectAdmin(ModelAdmin):
-    inlines = (
-        ProjectImageInline,
-    )
-
-    exclude = (
-        "slug",
-    )
-
+    inlines = (ProjectImageInline,)
     list_display = (
-        "cover_preview",
         "title",
         "category",
-        "location",
-        "completion_year",
-        "is_featured",
+        "project_type",
         "is_published",
-        "featured_order",
         "display_order",
-    )
-
-    list_display_links = (
-        "cover_preview",
-        "title",
-    )
-
-    list_editable = (
-        "is_featured",
-        "is_published",
-        "featured_order",
-        "display_order",
-    )
-
-    list_filter = (
-        "category",
-        "is_featured",
-        "is_published",
-        "completion_year",
-    )
-
-    search_fields = (
-        "title",
-        "location",
-        "short_description",
-        "challenge",
-        "approach",
-        "result",
-    )
-
-    ordering = (
-        "display_order",
-        "-completion_year",
-        "title",
-    )
-
-    autocomplete_fields = (
-        "category",
-    )
-
-    readonly_fields = (
-        "slug",
-        "created_at",
+        "image_count",
         "updated_at",
     )
-
+    # Publishing is intentionally done on the edit page so the inline image
+    # collection can be validated at the same time.
+    list_editable = ("display_order",)
+    list_filter = (
+        "is_featured",
+        "is_published",
+        "category",
+        "completion_year",
+    )
+    search_fields = (
+        "title",
+        "caption",
+        "location",
+        "category__name",
+    )
+    readonly_fields = ("slug", "created_at", "updated_at")
     fieldsets = (
         (
-            "Project Information",
+            "Basic information",
             {
-                "fields": (
-                    "title",
-                    "category",
-                    "location",
-                    "completion_year",
-                    "short_description",
+                "fields": ("title", "category", "caption"),
+                "description": (
+                    "Every project needs a title and at least one image."
                 ),
             },
         ),
         (
-            "Featured Case Study",
+            "Website display",
             {
-                "description": (
-                    "These fields are used when the project receives the "
-                    "large featured layout on the Projects page."
-                ),
                 "fields": (
+                    "is_featured",
+                    "is_published",
+                    "homepage_size",
+                    "display_order",
+                ),
+                "description": (
+                    "Featured projects use the detailed case-study layout "
+                    "and require at least three images. Homepage size "
+                    "controls the featured-project card layout."
+                ),
+            },
+        ),
+        (
+            "Featured project details",
+            {
+                "fields": (
+                    "location",
+                    "completion_year",
                     "duration",
                     "area",
                     "challenge",
@@ -149,65 +178,32 @@ class ProjectAdmin(ModelAdmin):
                     "result",
                     "materials",
                 ),
-            },
-        ),
-        (
-            "Website Display",
-            {
-                "fields": (
-                    "is_published",
-                    "is_featured",
-                    "featured_order",
-                    "display_order",
+                "classes": ("collapse",),
+                "description": (
+                    "Only complete this section for featured projects. "
+                    "Challenge, approach, and result are required when "
+                    "the project is featured."
                 ),
             },
         ),
         (
-            "System Information",
+            "Record information",
             {
-                "fields": (
-                    "slug",
-                    "created_at",
-                    "updated_at",
-                ),
-                "classes": (
-                    "collapse",
-                ),
+                "fields": ("created_at", "updated_at"),
+                "classes": ("collapse",),
             },
         ),
     )
+    ordering = ("display_order", "-completion_year", "title")
+    save_on_top = True
 
-    @admin.display(description="Cover")
-    def cover_preview(self, obj):
-        images = list(obj.images.all())
+    @admin.display(description="Type", ordering="is_featured")
+    def project_type(self, obj):
+        return "Featured" if obj.is_featured else "Normal"
 
-        cover_image = next(
-            (image for image in images if image.is_cover),
-            None,
-        )
-
-        if cover_image is None and images:
-            cover_image = images[0]
-
-        if cover_image is None or not cover_image.image:
-            return "—"
-
-        return format_html(
-            """
-            <img
-                src="{}"
-                alt="{}"
-                style="
-                    width: 72px;
-                    height: 52px;
-                    object-fit: cover;
-                    border-radius: 5px;
-                "
-            />
-            """,
-            cover_image.image.url,
-            cover_image.alt_text or obj.title,
-        )
+    @admin.display(description="Images")
+    def image_count(self, obj):
+        return len(obj.images.all())
 
     def get_queryset(self, request):
         return (
@@ -217,166 +213,66 @@ class ProjectAdmin(ModelAdmin):
             .prefetch_related("images")
         )
 
+    def save_model(self, request, obj, form, change):
+        # The inline formset validates the final image collection after the
+        # parent is saved, including first-time project creation.
+        obj._skip_image_set_validation = True
+        try:
+            super().save_model(request, obj, form, change)
+        finally:
+            obj._skip_image_set_validation = False
+
 
 @admin.register(ProjectImage)
 class ProjectImageAdmin(ModelAdmin):
     list_display = (
         "image_preview",
         "project",
-        "image_type",
+        "role",
         "is_cover",
         "display_order",
-        "show_on_homepage",
-        "homepage_order",
-        "homepage_size",
     )
-
-    list_display_links = (
-        "image_preview",
-        "project",
-    )
-
-    list_editable = (
-        "image_type",
-        "is_cover",
-        "display_order",
-        "show_on_homepage",
-        "homepage_order",
-        "homepage_size",
-    )
-
-    list_filter = (
-        "show_on_homepage",
-        "is_cover",
-        "homepage_size",
-        "image_type",
-        "project__category",
-    )
-
-    search_fields = (
-        "project__title",
-        "project__location",
-        "alt_text",
-        "caption",
-    )
-
-    autocomplete_fields = (
-        "project",
-    )
-
-    ordering = (
-        "-show_on_homepage",
-        "homepage_order",
-        "project__title",
-        "display_order",
-    )
-
-    list_select_related = (
-        "project",
-        "project__category",
-    )
-
-    readonly_fields = (
-        "large_image_preview",
-        "created_at",
-        "updated_at",
-    )
-
+    list_editable = ("is_cover", "display_order")
+    list_filter = ("role", "is_cover")
+    search_fields = ("project__title", "alt_text", "caption")
+    autocomplete_fields = ("project",)
+    readonly_fields = ("image_preview", "created_at", "updated_at")
     fieldsets = (
         (
             "Image",
             {
                 "fields": (
-                    "project",
+                    "image_preview",
                     "image",
-                    "large_image_preview",
+                    "project",
                     "alt_text",
                     "caption",
-                    "image_type",
-                ),
+                )
             },
         ),
         (
-            "Project Display",
-            {
-                "description": (
-                    "These settings control how the image is used inside "
-                    "its project."
-                ),
-                "fields": (
-                    "is_cover",
-                    "display_order",
-                ),
-            },
+            "Image usage",
+            {"fields": ("role", "is_cover", "display_order")},
         ),
         (
-            "Homepage Display",
+            "Record information",
             {
-                "description": (
-                    "Enable homepage display to include this exact image "
-                    "in the homepage project grid."
-                ),
-                "fields": (
-                    "show_on_homepage",
-                    "homepage_order",
-                    "homepage_size",
-                ),
-            },
-        ),
-        (
-            "System Information",
-            {
-                "fields": (
-                    "created_at",
-                    "updated_at",
-                ),
-                "classes": (
-                    "collapse",
-                ),
+                "fields": ("created_at", "updated_at"),
+                "classes": ("collapse",),
             },
         ),
     )
+    ordering = ("project", "display_order", "id")
+    list_select_related = ("project",)
+    save_on_top = True
 
     @admin.display(description="Preview")
     def image_preview(self, obj):
-        if not obj.image:
-            return "—"
-
+        if not obj.pk or not obj.image:
+            return "No image"
         return format_html(
-            """
-            <img
-                src="{}"
-                alt="{}"
-                style="
-                    width: 72px;
-                    height: 52px;
-                    object-fit: cover;
-                    border-radius: 5px;
-                "
-            />
-            """,
+            '<img src="{}" alt="{}" style="width:120px;height:80px;'
+            'object-fit:cover;border-radius:8px;">',
             obj.image.url,
-            obj.alt_text or obj.project.title,
-        )
-
-    @admin.display(description="Current Image")
-    def large_image_preview(self, obj):
-        if not obj or not obj.image:
-            return "No image uploaded"
-
-        return format_html(
-            """
-            <img
-                src="{}"
-                alt="{}"
-                style="
-                    width: min(100%, 520px);
-                    max-height: 340px;
-                    object-fit: contain;
-                    border-radius: 6px;
-                "
-            />
-            """,
-            obj.image.url,
-            obj.alt_text or obj.project.title,
+            obj.alt_text or "",
         )

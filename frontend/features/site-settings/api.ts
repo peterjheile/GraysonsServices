@@ -1,44 +1,25 @@
 import 'server-only';
 
-import { fallbackSiteSettings } from './fallback';
-import { siteSettingsSchema, type SiteSettings } from './types';
+import { fetchApi } from '@/lib/api/server';
 
+import { fallbackSiteSettings } from './fallback';
+import {
+  siteSettingsSchema,
+  type SiteSettings,
+} from './types';
+
+const SITE_SETTINGS_CACHE = {
+  revalidate: 300,
+  tags: ['site-settings'],
+} as const;
 
 export async function fetchSiteSettings(): Promise<SiteSettings> {
-  const apiUrl = process.env.DJANGO_API_URL;
-
-  if (!apiUrl) {
-    throw new Error('DJANGO_API_URL is not configured');
-  }
-
-  const response = await fetch(`${apiUrl}/api/site-settings/`, {
-    next: {
-      revalidate: 300,
-      tags: ['site-settings'],
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch SiteSettings: ${response.status} ${response.statusText}`
-    );
-  }
-
-  const data: unknown = await response.json();
-  const result = siteSettingsSchema.safeParse(data);
-
-  if (!result.success) {
-    console.error(
-      'Invalid SiteSettings response:',
-      result.error.issues
-    );
-
-    throw new Error('Invalid SiteSettings response');
-  }
-
-  return result.data;
+  return fetchApi(
+    '/api/site-settings/',
+    siteSettingsSchema,
+    SITE_SETTINGS_CACHE,
+  );
 }
-
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   try {
@@ -46,7 +27,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   } catch (error) {
     console.error(
       'Unable to load SiteSettings; using visual fallbacks.',
-      error
+      error,
     );
 
     return fallbackSiteSettings;

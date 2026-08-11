@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+
   images: {
     dangerouslyAllowLocalIP:
       process.env.NODE_ENV === 'development',
@@ -10,6 +12,16 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: '127.0.0.1',
         port: '8000',
+        pathname: '/media/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'graysonsservices.com',
+        pathname: '/media/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.graysonsservices.com',
         pathname: '/media/**',
       },
     ],

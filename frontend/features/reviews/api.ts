@@ -1,84 +1,36 @@
 import 'server-only';
 
-import { z } from 'zod';
+import { fetchApi } from '@/lib/api/server';
 
 import {
   reviewsSchema,
-  type Review,
   type ReviewFilters,
+  type Reviews,
 } from './types';
 
-const DJANGO_API_URL = (
-  process.env.DJANGO_API_URL ??
-  'http://127.0.0.1:8000'
-).replace(/\/$/, '');
+const REVIEWS_REVALIDATE_SECONDS = 300;
 
-const REVIEW_REVALIDATE_SECONDS = 300;
-
-function formatValidationError(error: z.ZodError): string {
-  return error.issues
-    .map((issue) => {
-      const path = issue.path.length
-        ? issue.path.join('.')
-        : 'response';
-
-      return `${path}: ${issue.message}`;
-    })
-    .join('; ');
+function normalizeCategorySlug(
+  categorySlug?: string,
+): string | undefined {
+  return categorySlug?.trim() || undefined;
 }
 
-async function fetchAndValidate<T>(
-  path: string,
-  schema: z.ZodType<T>,
-  cacheTags: string[]
-): Promise<T> {
-  const response = await fetch(
-    `${DJANGO_API_URL}${path}`,
-    {
-      next: {
-        revalidate: REVIEW_REVALIDATE_SECONDS,
-        tags: cacheTags,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Reviews API request failed: ${response.status} ${response.statusText}`
-    );
-  }
-
-  const data: unknown = await response.json();
-  const result = schema.safeParse(data);
-
-  if (!result.success) {
-    console.error(
-      `Invalid Reviews API response from "${path}":`,
-      result.error.issues
-    );
-
-    throw new Error(
-      `Invalid Reviews API response: ${formatValidationError(
-        result.error
-      )}`
-    );
-  }
-
-  return result.data;
-}
-
-function createReviewQuery(filters?: ReviewFilters): string {
-  if (!filters) {
-    return '';
-  }
-
+function createReviewQuery(
+  filters?: ReviewFilters,
+): string {
   const params = new URLSearchParams();
 
-  if (filters.categorySlug) {
-    params.set('category', filters.categorySlug);
+  const categorySlug =
+    normalizeCategorySlug(
+      filters?.categorySlug,
+    );
+
+  if (categorySlug) {
+    params.set('category', categorySlug);
   }
 
-  if (filters.source) {
+  if (filters?.source) {
     params.set('source', filters.source);
   }
 
@@ -87,49 +39,66 @@ function createReviewQuery(filters?: ReviewFilters): string {
   return query ? `?${query}` : '';
 }
 
-export async function getReviews(
-  filters?: ReviewFilters
-): Promise<Review[]> {
-  try {
-    const query = createReviewQuery(filters);
+export function fetchReviews(
+  filters?: ReviewFilters,
+): Promise<Reviews> {
+  const categorySlug =
+    normalizeCategorySlug(
+      filters?.categorySlug,
+    );
 
-    return await fetchAndValidate(
-      `/api/reviews/${query}`,
-      reviewsSchema,
-      [
+  const query = createReviewQuery(filters);
+
+  return fetchApi(
+    `/api/reviews/${query}`,
+    reviewsSchema,
+    {
+      revalidate:
+        REVIEWS_REVALIDATE_SECONDS,
+      tags: [
         'reviews',
-        filters?.categorySlug
-          ? `reviews-category-${filters.categorySlug}`
+        categorySlug
+          ? `reviews-category-${categorySlug}`
           : 'all-reviews',
         filters?.source
           ? `reviews-source-${filters.source}`
           : 'all-review-sources',
-      ]
-    );
-  } catch (error) {
-    console.error(
-      'Unable to load reviews; returning an empty list.',
-      error
-    );
-
-    return [];
-  }
+      ],
+    },
+  );
 }
 
-export async function getHomepageReviews(): Promise<Review[]> {
-  try {
-    return await fetchAndValidate(
-      '/api/reviews/homepage/',
-      reviewsSchema,
-      [
+export function getReviews(
+  filters?: ReviewFilters,
+): Promise<Reviews> {
+  return fetchReviews(filters);
+}
+
+export function fetchHomepageReviews():
+  Promise<Reviews> {
+  return fetchApi(
+    '/api/reviews/homepage/',
+    reviewsSchema,
+    {
+      revalidate:
+        REVIEWS_REVALIDATE_SECONDS,
+      tags: [
         'reviews',
         'homepage-reviews',
-      ]
-    );
+      ],
+    },
+  );
+}
+
+export async function getHomepageReviews():
+  Promise<Reviews> {
+  try {
+    return await fetchHomepageReviews();
   } catch (error) {
     console.error(
-      'Unable to load homepage reviews; returning an empty list.',
-      error
+      'Unable to load homepage reviews; ' +
+        'hiding the optional testimonials section.',
+      error,
     );
 
     return [];

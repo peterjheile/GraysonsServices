@@ -1,0 +1,15 @@
+Hi {{ submission.first_name }},
+
+Thank you for requesting an estimate from Grayson's Services. We received your project details and will review them shortly.
+
+REQUEST SUMMARY
+
+Service: {{ service_label }}
+Project size: {{ submission.get_project_size_display }}
+Budget: {{ submission.get_budget_display }}
+Timeline: {{ submission.get_timeline_display|default:"Not provided" }}
+Photos received: {{ photo_count }}
+
+A member of our team will reach out within 48 business hours. If you need to add anything, reply directly to this email.
+
+— Grayson's Services

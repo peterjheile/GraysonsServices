@@ -1,22 +1,34 @@
-import Header from "@/components/layout/Header"
-import Footer from "@/components/layout/Footer"
-import ServicesHero from "@/components/pages/services/ServicesHero"
-import ServicesNav from "@/components/pages/services/ServicesNav"
-import ServicesGrid from "@/components/pages/services/ServicesGrid"
-import ProcessSection from "@/components/pages/services/ProcessSection"
-import MaterialsSection from "@/components/pages/services/MaterialsSection"
+import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
+import ProcessSection from '@/components/pages/services/ProcessSection';
+import ServicesGrid from '@/components/pages/services/ServicesGrid';
+import ServicesHero from '@/components/pages/services/ServicesHero';
+import ServicesNav from '@/components/pages/services/ServicesNav';
 
-export default function ServicesPage() {
+import { getServices } from '@/features/services/api';
 
-    return (
-    <main className="grain h-1000">
-        <Header />
-        <ServicesHero/>
-        <ServicesNav/>
-        <ServicesGrid/>
-        <ProcessSection/>
-        {/* <MaterialsSection/> */}
-        <Footer/>
-    </main>
-    )
+export default async function ServicesPage() {
+  const services = await getServices();
+
+  const serviceNavItems = services.map(({ name, slug }) => ({
+    name,
+    slug,
+  }));
+
+  return (
+    <>
+      <Header />
+
+      <main className="grain">
+        <ServicesHero />
+
+        {services.length > 0 && <ServicesNav services={serviceNavItems} />}
+
+        <ServicesGrid services={services} />
+        <ProcessSection />
+      </main>
+
+      <Footer />
+    </>
+  );
 }

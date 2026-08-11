@@ -1,8 +1,31 @@
 import type { Metadata } from 'next';
+import {
+  Cormorant_Garamond,
+  DM_Sans,
+} from 'next/font/google';
 
 import { getSiteMetadata } from '@/features/site-settings/metadata';
 
+import RevealObserver from '@/components/ui/reveal-observer-client';
+
 import './globals.css';
+
+export const dynamic = 'force-dynamic';
+
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-dm-sans',
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-cormorant-garamond',
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   return getSiteMetadata();
@@ -10,20 +33,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>{children}</body>
+    <html
+      lang="en"
+      className={`
+        ${dmSans.variable}
+        ${cormorantGaramond.variable}
+      `}
+    >
+      <body className="font-sans antialiased">
+        <RevealObserver />
+        {children}
+      </body>
     </html>
   );
 }

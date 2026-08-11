@@ -34,11 +34,7 @@ export default function TransformationStrip() {
 
         {/* Wide slider */}
         <div className="reveal">
-          <BeforeAfterSlider
-            before="services/before.jpg"
-            after="services/after.jpg"
-            className="w-full aspect-[21/9] min-h-[280px]"
-          />
+
         </div>
 
         {/* Caption */}

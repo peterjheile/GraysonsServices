@@ -3,8 +3,8 @@ import Link from 'next/link';
 
 import type { QuickStats } from '@/features/company-stats/types';
 
-import RevealObserver from './RevealObserverClient';
-import type { AboutUs } from './view-types';
+import RevealObserver from '../../ui/reveal-observer-client';
+import type { AboutUs } from './types';
 
 type AboutProps = {
   about: AboutUs;
@@ -15,20 +15,23 @@ export default function About({
   about,
   quickStats,
 }: AboutProps) {
+  const yearsStat = quickStats?.years_in_business;
+
   return (
     <RevealObserver>
       <section
         id="about"
-        className="bg-white pt-28 lg:pt-40"
+        aria-labelledby="about-heading"
+        className="scroll-mt-24 overflow-x-clip bg-white pt-28 lg:pt-40"
       >
         <div className="mx-auto max-w-(--max-content-width) px-6 lg:px-12">
           <div className="grid items-center gap-16 pb-28 lg:grid-cols-2 lg:gap-28">
             {/* Image block */}
-            <div className="reveal-left relative mx-auto w-full max-w-112">
+            <div className="reveal-left relative mx-auto w-full max-w-md">
               <div className="relative aspect-4/5 w-full overflow-hidden lg:aspect-3/4">
                 <Image
                   src={about.url}
-                  alt="Grayson’s Services team at work"
+                  alt={about.imageAlt}
                   fill
                   sizes="(min-width: 496px) 448px, calc(100vw - 48px)"
                   className="object-cover object-center"
@@ -52,15 +55,15 @@ export default function About({
               </div>
 
               {/* Floating information chip */}
-              {quickStats && (
-                <div className="absolute -bottom-4 left-1/2 z-20 -translate-x-1/2 bg-stone-darkest px-6 py-5 text-center shadow-xl lg:left-0 lg:-translate-x-12">
+              {yearsStat && (
+                <div className="absolute -bottom-4 left-1/2 z-20 min-w-40 -translate-x-1/2 bg-stone-darkest px-6 py-5 text-center shadow-xl lg:left-0 lg:-translate-x-12">
                   <div className="font-['Cormorant_Garamond'] text-4xl font-semibold text-gold">
-                    {quickStats.years_in_business.value}
-                    {quickStats.years_in_business.suffix}
+                    {yearsStat.value}
+                    {yearsStat.suffix}
                   </div>
 
                   <div className="mt-1 text-[10px] tracking-[0.2em] text-stone-light uppercase">
-                    Years of Excellence
+                    {yearsStat.label}
                   </div>
                 </div>
               )}
@@ -77,11 +80,15 @@ export default function About({
                 {about.eyebrow}
               </span>
 
-              <h2 className="mt-4 mb-8 font-['Cormorant_Garamond'] text-[clamp(36px,4.5vw,60px)] leading-[1.1] font-light text-stone-darkest">
-                {about.titleLineNormal}
-                <br />
+              <h2
+                id="about-heading"
+                className="mt-4 mb-8 font-['Cormorant_Garamond'] text-[clamp(36px,4.5vw,60px)] leading-[1.1] font-light text-stone-darkest"
+              >
+                <span className="block">
+                  {about.titleLineNormal}
+                </span>
 
-                <em className="text-gold italic">
+                <em className="block text-gold italic">
                   {about.titleLineHighlight}
                 </em>
               </h2>
@@ -90,7 +97,7 @@ export default function About({
                 {about.paragraphs.map((paragraph, index) => (
                   <p
                     key={index}
-                    className="mx-auto max-w-100 lg:mx-0 lg:max-w-full"
+                    className="mx-auto max-w-lg lg:mx-0 lg:max-w-full"
                   >
                     {paragraph}
                   </p>

@@ -1,61 +1,123 @@
-import { z } from "zod";
+import { z } from 'zod';
 
+import {
+  nullableAssetUrlSchema,
+} from '@/lib/api/schemas';
+
+const requiredTextSchema = z
+  .string()
+  .trim()
+  .min(1);
+
+const optionalTextSchema = z
+  .string()
+  .trim();
+
+const nullableRequiredTextSchema =
+  requiredTextSchema.nullable();
 
 export const reviewSourceSchema = z.enum([
-  "google",
-  "facebook",
-  "in_person",
+  'google',
+  'facebook',
+  'in_person',
 ]);
-
 
 export const reviewProjectSchema = z.object({
   id: z.number().int().positive(),
-  title: z.string().min(1),
-  slug: z.string().min(1),
+  title: requiredTextSchema,
+  slug: requiredTextSchema,
 });
 
+export const reviewSchema = z
+  .object({
+    id: z.number().int().positive(),
 
-export const reviewSchema = z.object({
-  id: z.number().int().positive(),
+    reviewer_name: requiredTextSchema,
+    initials: requiredTextSchema,
+    role: optionalTextSchema,
+    quote: requiredTextSchema,
 
-  reviewer_name: z.string().min(1),
-  initials: z.string(),
-  role: z.string(),
-  quote: z.string().min(1),
+    rating: z
+      .number()
+      .int()
+      .min(1)
+      .max(5),
 
-  rating: z.number().int().min(1).max(5),
+    source: reviewSourceSchema,
+    source_label: requiredTextSchema,
 
-  source: reviewSourceSchema,
-  source_label: z.string().min(1),
+    category: nullableRequiredTextSchema,
+    category_slug: nullableRequiredTextSchema,
 
-  category: z.string().nullable(),
-  category_slug: z.string().nullable(),
+    project: reviewProjectSchema.nullable(),
 
-  project: reviewProjectSchema.nullable(),
+    profile_image_url:
+      nullableAssetUrlSchema,
 
-  profile_image_url: z.string().min(1).nullable(),
+    review_month: z
+      .number()
+      .int()
+      .min(1)
+      .max(12),
 
-  review_month: z.number().int().min(1).max(12),
-  review_month_name: z.string().min(1),
-  review_year: z.number().int().min(2015),
-  review_date_label: z.string().min(1),
+    review_month_name: requiredTextSchema,
 
-  show_on_homepage: z.boolean(),
-  is_featured: z.boolean(),
+    review_year: z
+      .number()
+      .int()
+      .positive(),
 
-  homepage_order: z.number().int().nonnegative(),
-  display_order: z.number().int().nonnegative(),
+    review_date_label: requiredTextSchema,
 
-  updated_at: z.iso.datetime({
-    offset: true,
-  }),
-});
+    show_on_homepage: z.boolean(),
+    is_featured: z.boolean(),
 
+    homepage_order: z
+      .number()
+      .int()
+      .nonnegative(),
+
+    display_order: z
+      .number()
+      .int()
+      .nonnegative(),
+
+    updated_at: z.iso.datetime({
+      offset: true,
+    }),
+  })
+  .superRefine((review, context) => {
+    const hasCategory =
+      review.category !== null;
+
+    const hasCategorySlug =
+      review.category_slug !== null;
+
+    if (hasCategory !== hasCategorySlug) {
+      context.addIssue({
+        code: 'custom',
+        path: ['category_slug'],
+        message:
+          'Category and category slug must both be present or both be null',
+      });
+    }
+
+    if (
+      review.is_featured &&
+      review.project === null
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['project'],
+        message:
+          'Featured reviews must reference a project',
+      });
+    }
+  });
 
 export const reviewsSchema = z.array(
   reviewSchema,
 );
-
 
 export type ReviewSource = z.infer<
   typeof reviewSourceSchema
@@ -67,6 +129,10 @@ export type ReviewProject = z.infer<
 
 export type Review = z.infer<
   typeof reviewSchema
+>;
+
+export type Reviews = z.infer<
+  typeof reviewsSchema
 >;
 
 export type ReviewFilters = {

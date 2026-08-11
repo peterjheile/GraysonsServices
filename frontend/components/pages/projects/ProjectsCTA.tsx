@@ -1,72 +1,125 @@
-'use client';
+import Link from 'next/link';
 
-import { useEffect, useRef } from 'react';
+const PROJECT_START_STEPS = [
+  {
+    number: '01',
+    title: 'Share Your Goal',
+    description:
+      'Tell us about the property, what you want to change, and any priorities you already have.',
+  },
+  {
+    number: '02',
+    title: 'Review the Details',
+    description:
+      'We will talk through the scope and arrange a closer look when the project calls for one.',
+  },
+  {
+    number: '03',
+    title: 'Plan the Next Step',
+    description:
+      'You will have a clearer path forward based on the needs of your project and property.',
+  },
+] as const;
 
 export default function ProjectsCTA() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible'); });
-      },
-      { threshold: 0.15 }
-    );
-    const els = ref.current?.querySelectorAll('.reveal, .reveal-left, .reveal-right');
-    els?.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section ref={ref} className="relative overflow-hidden bg-[#1a1714] py-28 lg:py-36">
-      {/* Background texture */}
+    <section
+      aria-labelledby="projects-cta-heading"
+      className="relative isolate overflow-hidden bg-stone-darkest pt-20 pb-16 sm:pt-24 sm:pb-20 lg:pt-32 lg:pb-24 [&+footer]:border-t-0"
+    >
       <div
-        className="absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage: `url('/HomeHero.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'grayscale(100%)',
-        }}
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,rgba(184,151,90,0.16),transparent_38%),radial-gradient(circle_at_90%_85%,rgba(184,151,90,0.08),transparent_34%)]"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#1a1714] via-[#1a1714]/90 to-[#1a1714]" />
 
-      <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="reveal-left">
-            <span className="text-[11px] tracking-[0.35em] uppercase text-[#b8975a] font-medium">Your Project, Next</span>
-            <h2 className="font-['Cormorant_Garamond'] text-[clamp(36px,4.5vw,64px)] font-light text-[#faf8f5] mt-3 leading-tight">
-              Ready to Write<br />
-              <em className="italic text-[#b8975a]">Your Before & After?</em>
-            </h2>
-            <p className="text-[#5c5550] text-base font-light leading-relaxed mt-6 max-w-md">
-              Again, a short description will go here. It is a call to action so should be more inspirational rather than facts.
-            </p>
-            <div className="flex flex-wrap gap-4 mt-10">
-              <a href="/contact" className="btn-primary">
-                <span>Get a Free Estimate</span>
-              </a>
-              <a href="/services" className="btn-outline">
-                <span>View Our Services</span>
-              </a>
-            </div>
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-linear-to-b from-transparent to-stone-darkest"
+      />
+
+      <div
+        className="
+          relative mx-auto grid w-full max-w-(--max-content-width)
+          gap-14 px-5
+          sm:px-6
+          md:px-8
+          lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]
+          lg:items-center lg:gap-20 lg:px-12
+        "
+      >
+        <div className="reveal-left min-w-0">
+          <p className="text-[10px] font-medium tracking-[0.35em] text-gold uppercase sm:text-[11px]">
+            Your Project Could Be Next
+          </p>
+
+          <h2
+            id="projects-cta-heading"
+            className="
+              mt-4 max-w-2xl
+              font-['Cormorant_Garamond']
+              text-[clamp(2.25rem,6vw,4rem)]
+              leading-[1.04] font-light text-white
+            "
+          >
+            Ready to Improve
+            <span className="block text-gold italic">
+              Your Property?
+            </span>
+          </h2>
+
+          <p className="mt-6 max-w-xl text-sm leading-relaxed font-light text-[#c4bbb4] sm:text-base">
+            Whether you know exactly what you need or are still weighing the
+            possibilities, start by telling us what you want the property to do
+            better.
+          </p>
+
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
+            <Link
+              href="/contact"
+              className="btn-primary w-full justify-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:transition-none motion-reduce:before:transition-none sm:w-auto"
+            >
+              <span>Request a Free Estimate</span>
+            </Link>
+
+            <Link
+              href="/services"
+              className="btn-outline w-full justify-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:transition-none sm:w-auto"
+            >
+              <span>Explore Services</span>
+            </Link>
           </div>
+        </div>
 
-          {/* Trust signals */}
-          <div className="reveal-right grid grid-cols-2 gap-3">
-            {[
-              { value: 'xxx', label: 'Projects Completed', sub: 'Across 8 service categories' },
-              { value: 'xxx', label: 'Years in Business', sub: 'Serving the Greater Ohio Region' },
-              { value: '100%', label: 'Satisfaction Rate', sub: 'Across verified reviews' },
-              { value: '$0', label: 'Estimate Cost', sub: 'No obligation, ever' },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-[#1e1b18] border border-[#2d2926] p-6">
-                <div className="font-['Cormorant_Garamond'] text-4xl font-semibold text-[#b8975a]">{stat.value}</div>
-                <div className="text-xs font-semibold text-[#faf8f5] mt-2 tracking-wide">{stat.label}</div>
-                <div className="text-[10px] text-[#5c5550] mt-1 leading-tight">{stat.sub}</div>
-              </div>
+        <div className="reveal-right min-w-0 border-t border-white/10 lg:border-t-0 lg:border-l lg:pl-10 xl:pl-14">
+          <p className="mt-8 text-[10px] font-medium tracking-[0.3em] text-[#8f857d] uppercase lg:mt-0">
+            A Straightforward Start
+          </p>
+
+          <ol className="mt-2 divide-y divide-white/10">
+            {PROJECT_START_STEPS.map((step) => (
+              <li
+                key={step.number}
+                className="grid grid-cols-[2rem_minmax(0,1fr)] gap-4 py-5 sm:grid-cols-[2.5rem_minmax(0,1fr)] sm:gap-5 sm:py-6"
+              >
+                <span
+                  aria-hidden="true"
+                  className="font-['Cormorant_Garamond'] text-2xl leading-none font-light text-gold sm:text-3xl"
+                >
+                  {step.number}
+                </span>
+
+                <div className="min-w-0">
+                  <h3 className="text-xs font-semibold tracking-[0.12em] text-white uppercase">
+                    {step.title}
+                  </h3>
+
+                  <p className="mt-2 text-xs leading-relaxed font-light text-[#a99f98] sm:text-sm">
+                    {step.description}
+                  </p>
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </div>
     </section>

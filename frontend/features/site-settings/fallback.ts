@@ -1,6 +1,6 @@
 import type { SiteSettings } from './types';
 
-export const fallbackSiteSettings: SiteSettings = {
+export const fallbackSiteSettings = {
   business_name: "Grayson's Services",
   tagline: '',
 
@@ -23,9 +23,11 @@ export const fallbackSiteSettings: SiteSettings = {
   linkedin_url: '',
 
   seo_title: "Grayson's Services",
-  seo_description: 'Professional property services in Bloomington, Indiana.',
+  seo_description:
+    'Professional property services in Bloomington, Indiana.',
   social_image_url: '/images/fallbacks/social-image.jpeg',
 
   business_hours: [],
-  updated_at: new Date(0).toISOString(),
-};
+
+  updated_at: '1970-01-01T00:00:00.000Z',
+} satisfies SiteSettings;

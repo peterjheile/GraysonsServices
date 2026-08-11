@@ -1,26 +1,208 @@
+name: ${COMPOSE_PROJECT_NAME:-graysons-services}
+
+x-django-environment: &django-environment
+  DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:?Set DJANGO_SETTINGS_MODULE}
+  SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:?Set ALLOWED_HOSTS}
+  CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?Set CORS_ALLOWED_ORIGINS}
+  CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:?Set CSRF_TRUSTED_ORIGINS}
+  DB_NAME: ${DB_NAME:?Set DB_NAME}
+  DB_USER: ${DB_USER:?Set DB_USER}
+  DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_CONN_MAX_AGE: ${DB_CONN_MAX_AGE:-60}
+  DB_SSLMODE: disable
+  RESEND_API_KEY: ${RESEND_API_KEY:?Set RESEND_API_KEY}
+  DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:?Set DEFAULT_FROM_EMAIL}
+  CONTACT_NOTIFICATION_EMAIL: ${CONTACT_NOTIFICATION_EMAIL:?Set CONTACT_NOTIFICATION_EMAIL}
+  QUOTE_NOTIFICATION_EMAIL: ${QUOTE_NOTIFICATION_EMAIL:?Set QUOTE_NOTIFICATION_EMAIL}
+  CAREERS_NOTIFICATION_EMAIL: ${CAREERS_NOTIFICATION_EMAIL:?Set CAREERS_NOTIFICATION_EMAIL}
+  EMAIL_TIMEOUT: ${EMAIL_TIMEOUT:-10}
+  STATIC_ROOT: /app/staticfiles
+  MEDIA_URL: ${MEDIA_URL:?Set MEDIA_URL}
+  MEDIA_ROOT: /app/media
+  PRIVATE_MEDIA_ROOT: /app/private_media
+  DJANGO_CACHE_LOCATION: /app/cache/django
+  DRF_NUM_PROXIES: ${DRF_NUM_PROXIES:-2}
+  CONTACT_SUBMISSION_BURST_RATE: ${CONTACT_SUBMISSION_BURST_RATE:-3/minute}
+  CONTACT_SUBMISSION_DAILY_RATE: ${CONTACT_SUBMISSION_DAILY_RATE:-5/day}
+  QUOTE_REQUEST_BURST_RATE: ${QUOTE_REQUEST_BURST_RATE:-3/minute}
+  QUOTE_REQUEST_DAILY_RATE: ${QUOTE_REQUEST_DAILY_RATE:-5/day}
+  JOB_APPLICATION_BURST_RATE: ${JOB_APPLICATION_BURST_RATE:-3/minute}
+  JOB_APPLICATION_DAILY_RATE: ${JOB_APPLICATION_DAILY_RATE:-5/day}
+  SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-True}
+  SECURE_HSTS_SECONDS: ${SECURE_HSTS_SECONDS:-3600}
+  SECURE_HSTS_INCLUDE_SUBDOMAINS: ${SECURE_HSTS_INCLUDE_SUBDOMAINS:-False}
+  SECURE_HSTS_PRELOAD: ${SECURE_HSTS_PRELOAD:-False}
+  WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+  GUNICORN_THREADS: ${GUNICORN_THREADS:-2}
+  GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-30}
+  GUNICORN_MAX_REQUESTS: ${GUNICORN_MAX_REQUESTS:-1000}
+  HEALTHCHECK_HOST: graysonsservices.com
+
+x-django-volumes: &django-volumes
+  - static_data:/app/staticfiles
+  - public_media:/app/media
+  - private_media:/app/private_media
+  - django_cache:/app/cache
+
 services:
-  backend:
-    build: ./backend
-    container_name: graysons-backend
-    stdin_open: true
-    tty: true
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?Set DB_NAME}
+      POSTGRES_USER: ${DB_USER:?Set DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
     volumes:
-      - ./backend:/backend
-    ports:
-      - "8000:8000"
-    command: python manage.py runserver 0.0.0.0:8000
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_internal
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    stop_grace_period: 60s
+
+  django_setup:
+    image: graysons-services-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: "no"
+    read_only: true
+    environment: *django-environment
+    command:
+      - sh
+      - -ec
+      - |
+        python manage.py migrate --noinput
+        python manage.py collectstatic --noinput
+        python manage.py check --deploy
+    volumes: *django-volumes
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    networks:
+      - app_internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  backend:
+    image: graysons-services-backend:latest
+    restart: unless-stopped
+    init: true
+    read_only: true
+    environment: *django-environment
+    volumes: *django-volumes
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    networks:
+      app_internal: {}
+      caddy_proxy:
+        aliases:
+          - graysons-services-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      django_setup:
+        condition: service_completed_successfully
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - /app/docker/healthcheck.py
+      interval: 30s
+      timeout: 6s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    stop_grace_period: 30s
 
   frontend:
-    build: ./frontend
-    container_name: graysons-frontend
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./frontend:/frontend
-      - /frontend/node_modules
-      - /frontend/.next
-    ports:
-      - "3000:3000"
+    image: graysons-services-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        DJANGO_API_URL: http://backend:8000
+        NEXT_PUBLIC_DJANGO_API_URL: ${NEXT_PUBLIC_DJANGO_API_URL:?Set NEXT_PUBLIC_DJANGO_API_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?Set NEXT_PUBLIC_SITE_URL}
+    restart: unless-stopped
+    init: true
+    read_only: true
     environment:
-      - WATCHPACK_POLLING=true
-    command: npm run dev -- --webpack --hostname 0.0.0.0 --port 3000
+      DJANGO_API_URL: http://backend:8000
+      NEXT_PUBLIC_DJANGO_API_URL: ${NEXT_PUBLIC_DJANGO_API_URL:?Set NEXT_PUBLIC_DJANGO_API_URL}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?Set NEXT_PUBLIC_SITE_URL}
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - frontend_cache:/app/.next/cache
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    networks:
+      app_internal: {}
+      caddy_proxy:
+        aliases:
+          - graysons-services-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - "3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          fetch('http://127.0.0.1:3000/').then((response) => {
+            if (response.status >= 500) process.exit(1)
+          }).catch(() => process.exit(1))
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    stop_grace_period: 30s
+
+networks:
+  app_internal:
+    internal: true
+  caddy_proxy:
+    external: true
+    name: ${CADDY_NETWORK:?Set CADDY_NETWORK to the existing Caddy network}
+
+volumes:
+  postgres_data:
+    name: graysons-services-postgres-data
+  static_data:
+    name: graysons-services-static
+  public_media:
+    name: graysons-services-public-media
+  private_media:
+    name: graysons-services-private-media
+  django_cache:
+    name: graysons-services-django-cache
+  frontend_cache:
+    name: graysons-services-next-cache

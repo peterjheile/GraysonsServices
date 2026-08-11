@@ -1,0 +1,28 @@
+www.graysonsservices.com {
+	redir https://graysonsservices.com{uri} permanent
+}
+
+graysonsservices.com {
+	encode zstd gzip
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	handle_path /media/* {
+		root * /srv/graysons-services/media
+		header Cache-Control "public, max-age=604800"
+		file_server
+	}
+
+	@django path /api /api/* /admin /admin/* /static /static/*
+	handle @django {
+		reverse_proxy graysons-services-backend:8000
+	}
+
+	handle {
+		reverse_proxy graysons-services-frontend:3000
+	}
+}

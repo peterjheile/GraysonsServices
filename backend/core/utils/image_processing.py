@@ -1,156 +1,169 @@
 from io import BytesIO
 from pathlib import Path
+from uuid import uuid4
 
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from PIL import Image, ImageOps
+from django.utils.text import slugify
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 
 LOGO_MAX_LONG_SIDE = 1000
 FAVICON_SIZE = 192
 SOCIAL_IMAGE_SIZE = (1200, 630)
+LOGO_MAX_PIXELS = 20_000_000
+FAVICON_MAX_PIXELS = 2048 * 2048
+SOCIAL_IMAGE_MAX_PIXELS = 30_000_000
 
 
-def create_optimized_logo(uploaded_file) -> ContentFile:
-    uploaded_file.open("rb")
+def _load_still_image(uploaded_file, *, max_pixels):
+    """Decode one bounded still image and detach it from the input file."""
+    try:
+        uploaded_file.open("rb")
+        with Image.open(uploaded_file) as source:
+            width, height = source.size
+            if width * height > max_pixels:
+                raise ValidationError(
+                    "This image is too large to process safely."
+                )
+            if getattr(source, "n_frames", 1) > 1:
+                raise ValidationError(
+                    "Animated images are not supported. "
+                    "Please upload a still image."
+                )
 
-    with Image.open(uploaded_file) as image:
-        image = ImageOps.exif_transpose(image)
+            oriented = ImageOps.exif_transpose(source)
+            try:
+                oriented.load()
+                return oriented.copy()
+            finally:
+                if oriented is not source:
+                    oriented.close()
+    except ValidationError:
+        raise
+    except (
+        Image.DecompressionBombError,
+        UnidentifiedImageError,
+        OSError,
+        SyntaxError,
+        ValueError,
+    ) as error:
+        raise ValidationError(
+            "The uploaded file is not a valid supported image."
+        ) from error
+    finally:
+        try:
+            uploaded_file.seek(0)
+        except (AttributeError, OSError, ValueError):
+            pass
 
-        # Preserve transparency when present.
-        if image.mode in ("RGBA", "LA") or (
-            image.mode == "P" and "transparency" in image.info
-        ):
-            image = image.convert("RGBA")
-        else:
-            image = image.convert("RGB")
 
+def _unique_name(uploaded_file, suffix, extension):
+    stem = slugify(Path(uploaded_file.name).stem) or "site-image"
+    return f"{stem}-{uuid4().hex[:10]}-{suffix}.{extension}"
+
+
+def create_optimized_logo(uploaded_file):
+    image = _load_still_image(
+        uploaded_file,
+        max_pixels=LOGO_MAX_PIXELS,
+    )
+    try:
+        has_transparency = (
+            image.mode in ("RGBA", "LA")
+            or (image.mode == "P" and "transparency" in image.info)
+        )
+        converted = image.convert("RGBA" if has_transparency else "RGB")
+        image.close()
+        image = converted
         width, height = image.size
         longest_side = max(width, height)
-
-        # Do not enlarge smaller images.
         if longest_side > LOGO_MAX_LONG_SIDE:
             scale = LOGO_MAX_LONG_SIDE / longest_side
-
-            new_size = (
-                round(width * scale),
-                round(height * scale),
-            )
-
-            image = image.resize(
-                new_size,
+            resized = image.resize(
+                (round(width * scale), round(height * scale)),
                 Image.Resampling.LANCZOS,
             )
+            image.close()
+            image = resized
 
-        output = BytesIO()
+        with BytesIO() as output:
+            image.save(output, format="WEBP", lossless=True, method=6)
+            return ContentFile(
+                output.getvalue(),
+                name=_unique_name(uploaded_file, "optimized", "webp"),
+            )
+    finally:
+        image.close()
 
-        image.save(
-            output,
-            format="WEBP",
-            lossless=True,
-            method=6,
-        )
 
-    uploaded_file.seek(0)
-    output.seek(0)
-
-    original_stem = Path(uploaded_file.name).stem
-    filename = f"{original_stem}-optimized.webp"
-
-    return ContentFile(
-        output.read(),
-        name=filename,
+def create_optimized_favicon(uploaded_file):
+    image = _load_still_image(
+        uploaded_file,
+        max_pixels=FAVICON_MAX_PIXELS,
     )
-
-
-def create_optimized_favicon(uploaded_file) -> ContentFile:
-    uploaded_file.open("rb")
-
-    with Image.open(uploaded_file) as image:
-        image = ImageOps.exif_transpose(image)
-
-        # PNG supports transparency, so use RGBA consistently.
-        image = image.convert("RGBA")
-
-        image = image.resize(
+    try:
+        converted = image.convert("RGBA")
+        image.close()
+        image = converted
+        resized = image.resize(
             (FAVICON_SIZE, FAVICON_SIZE),
             Image.Resampling.LANCZOS,
         )
+        image.close()
+        image = resized
+        with BytesIO() as output:
+            image.save(output, format="PNG", optimize=True)
+            return ContentFile(
+                output.getvalue(),
+                name=_unique_name(uploaded_file, "favicon", "png"),
+            )
+    finally:
+        image.close()
 
-        output = BytesIO()
 
-        image.save(
-            output,
-            format="PNG",
-            optimize=True,
-        )
-
-    uploaded_file.seek(0)
-    output.seek(0)
-
-    original_stem = Path(uploaded_file.name).stem
-    filename = f"{original_stem}-favicon.png"
-
-    return ContentFile(
-        output.read(),
-        name=filename,
+def create_optimized_social_image(uploaded_file):
+    image = _load_still_image(
+        uploaded_file,
+        max_pixels=SOCIAL_IMAGE_MAX_PIXELS,
     )
-
-
-
-def create_optimized_social_image(uploaded_file) -> ContentFile:
-    uploaded_file.open("rb")
-
-    with Image.open(uploaded_file) as image:
-        image = ImageOps.exif_transpose(image)
-
-        # JPEG does not support transparency. Place transparent areas
-        # over a white background.
-        if image.mode in ("RGBA", "LA") or (
-            image.mode == "P" and "transparency" in image.info
-        ):
-            image = image.convert("RGBA")
-
-            background = Image.new(
-                "RGB",
-                image.size,
-                color="white",
-            )
-
-            background.paste(
-                image,
-                mask=image.getchannel("A"),
-            )
-
+    try:
+        has_transparency = (
+            image.mode in ("RGBA", "LA")
+            or (image.mode == "P" and "transparency" in image.info)
+        )
+        if has_transparency:
+            converted = image.convert("RGBA")
+            image.close()
+            image = converted
+            background = Image.new("RGB", image.size, color="white")
+            background.paste(image, mask=image.getchannel("A"))
+            image.close()
             image = background
         else:
-            image = image.convert("RGB")
+            converted = image.convert("RGB")
+            image.close()
+            image = converted
 
-        # Center-crop to the correct aspect ratio and resize without
-        # stretching the image.
-        image = ImageOps.fit(
+        fitted = ImageOps.fit(
             image,
             SOCIAL_IMAGE_SIZE,
             method=Image.Resampling.LANCZOS,
             centering=(0.5, 0.5),
         )
-
-        output = BytesIO()
-
-        image.save(
-            output,
-            format="JPEG",
-            quality=90,
-            optimize=True,
-            progressive=True,
-        )
-
-    uploaded_file.seek(0)
-    output.seek(0)
-
-    original_stem = Path(uploaded_file.name).stem
-    filename = f"{original_stem}-social.jpg"
-
-    return ContentFile(
-        output.read(),
-        name=filename,
-    )
+        image.close()
+        image = fitted
+        with BytesIO() as output:
+            image.save(
+                output,
+                format="JPEG",
+                quality=90,
+                optimize=True,
+                progressive=True,
+            )
+            return ContentFile(
+                output.getvalue(),
+                name=_unique_name(uploaded_file, "social", "jpg"),
+            )
+    finally:
+        image.close()

@@ -2,79 +2,78 @@ import 'server-only';
 
 import type { Metadata } from 'next';
 
-import { fetchSiteSettings } from './api';
+import { getSiteSettings } from './api';
+import { fallbackSiteSettings } from './fallback';
+import type { SiteSettings } from './types';
 
-const metadataBase = new URL(
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-);
+function getMetadataBase(): URL {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
-const defaultTitle = "Grayson's Services";
-const defaultDescription = "Grayson's Services provides professional property services in Bloomington, Indiana.";
-const defaultSocialImage = '/images/fallbacks/social-image.jpg';
-const defaultFavicon = '/favicon.ico';
+  if (!siteUrl) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'NEXT_PUBLIC_SITE_URL is required in production',
+      );
+    }
 
-export const defaultMetadata: Metadata = {
-  metadataBase,
+    return new URL('http://localhost:3000');
+  }
 
-  title: defaultTitle,
-  description: defaultDescription,
+  return new URL(siteUrl);
+}
 
-  icons: {
-    icon: defaultFavicon,
-  },
+const metadataBase = getMetadataBase();
 
-  openGraph: {
-    title: defaultTitle,
-    description: defaultDescription,
-    images: [defaultSocialImage],
-  },
+function createSiteMetadata(
+  settings: SiteSettings,
+): Metadata {
+  const title =
+    settings.seo_title ||
+    settings.business_name;
 
-  twitter: {
-    card: 'summary_large_image',
-    title: defaultTitle,
-    description: defaultDescription,
-    images: [defaultSocialImage],
-  },
-};
+  const description =
+    settings.seo_description ||
+    fallbackSiteSettings.seo_description;
 
-export async function getSiteMetadata(): Promise<Metadata> {
-  try {
-    const settings = await fetchSiteSettings();
+  const socialImage =
+    settings.social_image_url ||
+    fallbackSiteSettings.social_image_url;
 
-    const title = settings.seo_title || settings.business_name;
-    const description = settings.seo_description || defaultDescription;
-    const socialImage = settings.social_image_url || defaultSocialImage;
-    const favicon = settings.favicon_url || defaultFavicon;
+  const favicon =
+    settings.favicon_url ||
+    fallbackSiteSettings.favicon_url;
 
-    return {
-      metadataBase,
+  return {
+    metadataBase,
 
+    title,
+    description,
+
+    icons: {
+      icon: favicon,
+    },
+
+    openGraph: {
       title,
       description,
+      images: socialImage ? [socialImage] : undefined,
+    },
 
-      icons: {
-        icon: favicon,
-      },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: socialImage ? [socialImage] : undefined,
+    },
+  };
+}
 
-      openGraph: {
-        title,
-        description,
-        images: [socialImage],
-      },
+export const defaultMetadata = createSiteMetadata(
+  fallbackSiteSettings,
+);
 
-      twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [socialImage],
-      },
-    };
-  } catch (error) {
-    console.error(
-      'Unable to generate dynamic metadata; using static defaults.',
-      error
-    );
+export async function getSiteMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
 
-    return defaultMetadata;
-  }
+  return createSiteMetadata(settings);
 }

@@ -1,61 +1,48 @@
 import 'server-only';
 
-import { cache } from 'react';
+import { fetchApi } from '@/lib/api/server';
 
 import {
   serviceNamesSchema,
+  servicesSchema,
   type ServiceNames,
+  type Services,
 } from './types';
 
-export const fetchServiceNames = cache(
-  async (): Promise<ServiceNames> => {
-    const apiUrl = process.env.DJANGO_API_URL;
+const SERVICES_CACHE = {
+  revalidate: 300,
+  tags: ['services'],
+} as const;
 
-    if (!apiUrl) {
-      throw new Error('DJANGO_API_URL is not configured');
-    }
+export function fetchServiceNames(): Promise<ServiceNames> {
+  return fetchApi(
+    '/api/services/names/',
+    serviceNamesSchema,
+    SERVICES_CACHE,
+  );
+}
 
-    const response = await fetch(
-      `${apiUrl}/api/services/names/`,
-      {
-        next: {
-          revalidate: 300,
-          tags: ['services'],
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch service names: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const data: unknown = await response.json();
-    const result = serviceNamesSchema.safeParse(data);
-
-    if (!result.success) {
-      console.error(
-        'Invalid service names response:',
-        result.error.issues
-      );
-
-      throw new Error('Invalid service names response');
-    }
-
-    return result.data;
-  }
-);
+export function fetchServices(): Promise<Services> {
+  return fetchApi(
+    '/api/services/',
+    servicesSchema,
+    SERVICES_CACHE,
+  );
+}
 
 export async function getServiceNames(): Promise<ServiceNames> {
   try {
     return await fetchServiceNames();
   } catch (error) {
     console.error(
-      'Unable to load service names; returning an empty list.',
-      error
+      'Unable to load service names; hiding optional service lists.',
+      error,
     );
 
     return [];
   }
+}
+
+export function getServices(): Promise<Services> {
+  return fetchServices();
 }

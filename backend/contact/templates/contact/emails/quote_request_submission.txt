@@ -1,0 +1,31 @@
+A new estimate request has been received.
+
+CONTACT INFORMATION
+
+Name: {{ full_name }}
+Email: {{ submission.email }}
+Phone: {{ submission.phone }}
+Address: {{ submission.address|default:"Not provided" }}
+City: {{ submission.city|default:"Not provided" }}
+
+PROJECT DETAILS
+
+Service: {{ service_label }}
+Project size: {{ submission.get_project_size_display }}
+Budget: {{ submission.get_budget_display }}
+Timeline: {{ submission.get_timeline_display|default:"Not provided" }}
+
+DESCRIPTION
+
+{{ submission.description|default:"Not provided" }}
+
+ADDITIONAL INFORMATION
+
+Referral source: {{ submission.get_heard_about_display|default:"Not provided" }}
+Photos: {{ photo_count }} uploaded privately; open the request in Django admin to download them.
+
+SUBMITTED
+
+{{ submitted_at|date:"F j, Y \a\t g:i A" }}
+
+Reply directly to this email to respond to {{ submission.first_name }}.

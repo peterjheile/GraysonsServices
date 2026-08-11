@@ -1,70 +1,135 @@
 'use client';
 
-import { useState } from 'react';
-import type { Project } from './projectsData';
+import { useMemo } from 'react';
 
-export default function ProjectCard({ project }: { project: Project }) {
-  const [showAfter, setShowAfter] = useState(true);
+import Image from 'next/image';
+
+import type { Project } from '@/features/projects/types';
+
+import ProjectMediaViewer, {
+  getUniqueProjectImages,
+} from './ProjectMediaViewer';
+
+interface ProjectCardProps {
+  project: Project;
+}
+
+export default function ProjectCard({
+  project,
+}: ProjectCardProps) {
+  const headingId = `project-${project.id}-title`;
+  const images = useMemo(
+    () => getUniqueProjectImages(project),
+    [project],
+  );
+  const cardImage = project.cover_image ?? images[0] ?? null;
 
   return (
-    <div className="reveal-scale group">
-      {/* Image toggle area */}
-      <div className="relative aspect-[4/3] overflow-hidden mb-4 cursor-pointer" onClick={() => setShowAfter(!showAfter)}>
-        {/* After */}
-        <img
-          src={project.after}
-          alt={`${project.title} — after`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${showAfter ? 'opacity-100' : 'opacity-0'}`}
-        />
-        {/* Before */}
-        <img
-          src={project.before}
-          alt={`${project.title} — before`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${showAfter ? 'opacity-0' : 'opacity-100'}`}
-        />
-
-        {/* Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1714]/70 via-transparent to-transparent" />
-
-        {/* Toggle pill */}
-        <button
-          className="absolute bottom-3 left-3 flex overflow-hidden bg-[#1a1714]/70 backdrop-blur-sm"
-          onClick={(e) => { e.stopPropagation(); setShowAfter(!showAfter); }}
+    <ProjectMediaViewer
+      projectTitle={project.title}
+      images={images}
+    >
+      {({ imageCount, openGallery }) => (
+        <article
+          aria-labelledby={headingId}
+          className="flex h-full flex-col"
         >
-          <span className={`px-3 py-1.5 text-[9px] tracking-[0.25em] uppercase font-semibold transition-colors duration-300 ${!showAfter ? 'bg-[#faf8f5] text-[#1a1714]' : 'text-[#5c5550]'}`}>
-            Before
-          </span>
-          <span className={`px-3 py-1.5 text-[9px] tracking-[0.25em] uppercase font-semibold transition-colors duration-300 ${showAfter ? 'bg-[#b8975a] text-[#1a1714]' : 'text-[#5c5550]'}`}>
-            After
-          </span>
-        </button>
+          {cardImage ? (
+            <button
+              type="button"
+              aria-label={`View project photos for ${project.title}`}
+              onClick={() => openGallery(cardImage.id)}
+              className="group relative mb-4 block aspect-4/3 w-full overflow-hidden bg-[#eee9e2] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+            >
+              <Image
+                src={cardImage.image_url}
+                alt={
+                  cardImage.alt_text ||
+                  `${project.title} completed by Grayson’s Services`
+                }
+                fill
+                sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
+                className="object-cover transform-gpu transition-transform duration-500 ease-out group-hover:scale-[1.025] group-focus-visible:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none"
+              />
+            </button>
+          ) : (
+            <div className="mb-4 flex aspect-4/3 items-center justify-center bg-[#eee9e2] px-6 text-center">
+              <span className="text-[10px] font-medium tracking-[0.25em] text-stone-light uppercase">
+                Project images coming soon
+              </span>
+            </div>
+          )}
 
-        {/* Category badge */}
-        <div className="absolute top-3 right-3">
-          <span className="px-2.5 py-1 bg-[#1a1714]/80 backdrop-blur-sm text-[9px] tracking-[0.2em] uppercase text-[#b8975a]">
-            {project.category}
-          </span>
-        </div>
-      </div>
+          <div className="flex flex-1 flex-col">
+            {(project.category || project.completion_year !== null) && (
+              <div className="mb-2 flex items-start justify-between gap-4">
+                {project.category ? (
+                  <p className="text-[9px] leading-relaxed font-medium tracking-[0.2em] text-gold uppercase sm:text-[10px]">
+                    {project.category}
+                  </p>
+                ) : null}
 
-      {/* Info */}
-      <div>
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="font-['Cormorant_Garamond'] text-xl font-semibold text-[#1a1714] leading-tight group-hover:text-[#b8975a] transition-colors duration-200">
-            {project.title}
-          </h3>
-          <span className="text-[10px] tracking-[0.1em] text-[#a39890] shrink-0 mt-1">{project.year}</span>
-        </div>
-        <div className="text-[10px] tracking-[0.2em] uppercase text-[#a39890] mb-3">{project.location}</div>
-        <p className="text-xs text-[#5c5550] font-light leading-relaxed line-clamp-2">{project.summary}</p>
+                {project.completion_year !== null && (
+                  <p className="ml-auto shrink-0 text-[10px] leading-relaxed tracking-[0.1em] text-stone-light">
+                    {project.completion_year}
+                  </p>
+                )}
+              </div>
+            )}
 
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {project.tags.slice(0, 3).map((t) => (
-            <span key={t} className="px-2 py-0.5 border border-[#e8e2da] text-[9px] tracking-[0.1em] uppercase text-[#a39890]">{t}</span>
-          ))}
-        </div>
-      </div>
-    </div>
+            <h3
+              id={headingId}
+              className="mb-1 font-['Cormorant_Garamond'] text-xl leading-tight font-semibold text-stone-darkest sm:text-2xl"
+            >
+              {project.title}
+            </h3>
+
+            {project.location && (
+              <p className="mb-3 text-[10px] tracking-[0.2em] text-stone-light uppercase">
+                {project.location}
+              </p>
+            )}
+
+            {project.caption && (
+              <p className="line-clamp-2 text-xs leading-relaxed font-light text-stone">
+                {project.caption}
+              </p>
+            )}
+
+            {imageCount > 0 ? (
+              <button
+                type="button"
+                aria-label={`View project photos for ${project.title}`}
+                onClick={() => openGallery()}
+                className="group mt-auto inline-flex w-fit items-center gap-2 pt-5 text-[10px] font-semibold tracking-[0.2em] text-stone-darkest uppercase transition-colors duration-200 hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:transition-none"
+              >
+                <span>View project</span>
+
+                <svg
+                  aria-hidden="true"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  className="transition-transform duration-200 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
+                >
+                  <path
+                    d="M1.5 6h9M7 2.5 10.5 6 7 9.5"
+                    stroke="currentColor"
+                    strokeWidth="1.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            ) : (
+              <span className="mt-auto pt-5 text-[10px] font-medium tracking-[0.2em] text-stone-light uppercase">
+                Photos coming soon
+              </span>
+            )}
+          </div>
+        </article>
+      )}
+    </ProjectMediaViewer>
   );
 }

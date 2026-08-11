@@ -1,169 +1,133 @@
-import { z } from "zod";
+import { z } from 'zod';
 
+import { assetUrlSchema } from '@/lib/api/schemas';
 
-export const projectImageTypeSchema = z.enum([
-  "before",
-  "after",
-  "process",
-  "finished",
-  "detail",
+const requiredTextSchema = z
+  .string()
+  .trim()
+  .min(1);
+
+const optionalTextSchema = z
+  .string()
+  .trim();
+
+export const projectSlugSchema =
+  requiredTextSchema;
+
+export const projectImageRoleSchema = z.enum([
+  'general',
+  'before',
+  'after',
 ]);
-
-export const homepageImageSizeSchema = z.enum([
-  "standard",
-  "tall",
-  "wide",
-]);
-
-
-export const projectReferenceSchema = z.object({
-  id: z.number().int().positive(),
-  title: z.string().min(1),
-  slug: z.string().min(1),
-  category: z.string().min(1),
-  category_slug: z.string().min(1),
-  location: z.string(),
-});
-
-
-export const homepageProjectImageSchema = z.object({
-  id: z.number().int().positive(),
-
-  image_url: z.string().min(1),
-  alt_text: z.string().min(1),
-  caption: z.string(),
-
-  image_type: projectImageTypeSchema,
-  is_cover: z.boolean(),
-
-  show_on_homepage: z.boolean(),
-  homepage_order: z.number().int().nonnegative(),
-  homepage_size: homepageImageSizeSchema,
-
-  display_order: z.number().int().nonnegative(),
-
-  project: projectReferenceSchema,
-});
-
-
-export const projectCardImageSchema = z.object({
-  id: z.number().int().positive(),
-  image_url: z.string().min(1),
-  alt_text: z.string().min(1),
-});
-
-
-export const projectCardSchema = z.object({
-  id: z.number().int().positive(),
-
-  title: z.string().min(1),
-  slug: z.string().min(1),
-
-  category: z.string().min(1),
-  category_slug: z.string().min(1),
-
-  location: z.string(),
-  completion_year: z.number().int().positive().nullable(),
-
-  short_description: z.string(),
-
-  is_featured: z.boolean(),
-  featured_order: z.number().int().nonnegative(),
-  display_order: z.number().int().nonnegative(),
-
-  cover_image: projectCardImageSchema.nullable(),
-});
-
 
 export const projectImageSchema = z.object({
   id: z.number().int().positive(),
 
-  image_url: z.string().min(1),
-  alt_text: z.string().min(1),
-  caption: z.string(),
+  image_url: assetUrlSchema,
+  alt_text: requiredTextSchema,
+  caption: optionalTextSchema,
 
-  image_type: projectImageTypeSchema,
+  role: projectImageRoleSchema,
   is_cover: z.boolean(),
-  display_order: z.number().int().nonnegative(),
+  display_order: z
+    .number()
+    .int()
+    .nonnegative(),
 });
 
+export const homepageProjectSizeSchema = z.enum([
+  'standard',
+  'tall',
+  'wide',
+]);
 
-export const projectDetailSchema = z.object({
+export const homepageFeaturedProjectSchema =
+  z.object({
+    slug: projectSlugSchema,
+    title: requiredTextSchema,
+
+    category: requiredTextSchema.nullable(),
+    category_slug:
+      projectSlugSchema.nullable(),
+
+    location: optionalTextSchema,
+    homepage_size: homepageProjectSizeSchema,
+
+    cover_image: projectImageSchema.nullable(),
+  });
+
+export const projectSchema = z.object({
   id: z.number().int().positive(),
 
-  title: z.string().min(1),
-  slug: z.string().min(1),
+  slug: projectSlugSchema,
+  title: requiredTextSchema,
+  caption: optionalTextSchema,
 
-  category: z.string().min(1),
-  category_slug: z.string().min(1),
-
-  location: z.string(),
-  completion_year: z.number().int().positive().nullable(),
-
-  short_description: z.string(),
-
-  duration: z.string(),
-  area: z.string(),
-
-  challenge: z.string(),
-  approach: z.string(),
-  result: z.string(),
-
-  materials: z.array(z.string()),
+  category: requiredTextSchema.nullable(),
+  category_slug: projectSlugSchema.nullable(),
 
   is_featured: z.boolean(),
-  featured_order: z.number().int().nonnegative(),
-  display_order: z.number().int().nonnegative(),
+  is_published: z.boolean(),
+  display_order: z
+    .number()
+    .int()
+    .nonnegative(),
 
+  location: optionalTextSchema,
+  completion_year: z
+    .number()
+    .int()
+    .positive()
+    .nullable(),
+
+  duration: optionalTextSchema,
+  area: optionalTextSchema,
+
+  challenge: optionalTextSchema,
+  approach: optionalTextSchema,
+  result: optionalTextSchema,
+
+  materials: z.array(requiredTextSchema),
+
+  cover_image: projectImageSchema.nullable(),
   images: z.array(projectImageSchema),
-
-  updated_at: z.iso.datetime({
-    offset: true,
-  }),
 });
 
+export const homepageFeaturedProjectsSchema =
+  z.array(homepageFeaturedProjectSchema);
 
-export const homepageProjectImagesSchema = z.array(
-  homepageProjectImageSchema,
+export const projectsSchema = z.array(
+  projectSchema,
 );
 
-export const projectCardsSchema = z.array(
-  projectCardSchema,
-);
-
-export const projectDetailsSchema = z.array(
-  projectDetailSchema,
-);
-
-
-export type ProjectImageType = z.infer<
-  typeof projectImageTypeSchema
+export type ProjectSlug = z.infer<
+  typeof projectSlugSchema
 >;
 
-export type HomepageImageSize = z.infer<
-  typeof homepageImageSizeSchema
->;
-
-export type ProjectReference = z.infer<
-  typeof projectReferenceSchema
->;
-
-export type HomepageProjectImage = z.infer<
-  typeof homepageProjectImageSchema
->;
-
-export type ProjectCardImage = z.infer<
-  typeof projectCardImageSchema
->;
-
-export type ProjectCard = z.infer<
-  typeof projectCardSchema
+export type ProjectImageRole = z.infer<
+  typeof projectImageRoleSchema
 >;
 
 export type ProjectImage = z.infer<
   typeof projectImageSchema
 >;
 
-export type ProjectDetail = z.infer<
-  typeof projectDetailSchema
+export type HomepageProjectSize = z.infer<
+  typeof homepageProjectSizeSchema
+>;
+
+export type HomepageFeaturedProject = z.infer<
+  typeof homepageFeaturedProjectSchema
+>;
+
+export type HomepageFeaturedProjects = z.infer<
+  typeof homepageFeaturedProjectsSchema
+>;
+
+export type Project = z.infer<
+  typeof projectSchema
+>;
+
+export type Projects = z.infer<
+  typeof projectsSchema
 >;

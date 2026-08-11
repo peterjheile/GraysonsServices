@@ -1,173 +1,69 @@
-"use client";
+import Link from 'next/link';
 
-import { useEffect, useRef, useState } from "react";
+import FeaturedProject from '@/components/pages/projects/FeaturedProject';
+import ProjectCard from '@/components/pages/projects/ProjectCard';
 
-import FeaturedProject from "@/components/pages/projects/FeaturedProject";
-import ProjectCard from "@/components/pages/projects/ProjectCard";
+import type { Project } from '@/features/projects/types';
 
-import { categories, projects } from "./projectsData";
+interface ProjectsGridProps {
+  featuredProjects: readonly Project[];
+  projects: readonly Project[];
+  hasProjectData: boolean;
+}
 
-export default function ProjectsGrid() {
-  const [activeCategory, setActiveCategory] = useState("All");
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const filteredProjects = projects.filter(
-    (project) =>
-      activeCategory === "All" || project.category === activeCategory,
-  );
-
-  const featuredProjects = filteredProjects.filter(
-    (project) => project.featured,
-  );
-
-  const remainingProjects = filteredProjects.filter(
-    (project) => !project.featured,
-  );
-
-  const projectCount = filteredProjects.length;
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.08,
-      },
-    );
-
-    const elements = containerRef.current?.querySelectorAll(
-      ".reveal, .reveal-scale",
-    );
-
-    elements?.forEach((element) => {
-      observer.observe(element);
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [activeCategory]);
+export default function ProjectsGrid({
+  featuredProjects,
+  projects,
+  hasProjectData,
+}: ProjectsGridProps) {
+  if (!hasProjectData) {
+    return <ProjectsEmptyState />;
+  }
 
   return (
-    <div
-      ref={containerRef}
-      className="
-        mx-auto w-full max-w-(--max-content-width)
-        px-5 py-12
-        sm:px-6 sm:py-16
-        md:px-8
-        lg:px-12 lg:py-24
-      "
-    >
-      {/* Filter bar */}
-      <div
-        className="
-          reveal mb-10
-          flex flex-col gap-4
-          sm:mb-12
-          lg:flex-row lg:items-center lg:justify-between
-        "
-      >
-        <div
-          className="
-            flex gap-2 overflow-x-auto pb-2
-            sm:flex-wrap sm:overflow-visible sm:pb-0
-          "
-        >
-          {categories.map((category) => {
-            const isActive = activeCategory === category;
-
-            return (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                aria-pressed={isActive}
-                className={`
-                  shrink-0 border px-4 py-2.5
-                  text-[10px] font-medium uppercase tracking-[0.22em]
-                  transition-all duration-300
-
-                  ${
-                    isActive
-                      ? "border-gold bg-gold text-stone-darkest"
-                      : "border-stone-pale text-stone-light hover:border-gold/40 hover:text-stone-mid"
-                  }
-                `}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </div>
-
-        <span
-          className="
-            text-[10px] font-medium uppercase tracking-[0.2em]
-            text-stone-light
-            lg:shrink-0 lg:text-right
-          "
-        >
-          {projectCount} {projectCount === 1 ? "project" : "projects"}
-        </span>
-      </div>
-
-      {/* Featured projects */}
+    <div>
       {featuredProjects.length > 0 && (
         <section aria-labelledby="featured-projects-heading">
-          <div className="reveal mb-8 flex items-center gap-4 sm:mb-10">
-            <div className="h-px w-6 shrink-0 bg-gold" />
-
-            <h2
-              id="featured-projects-heading"
-              className="
-                text-[10px] font-medium uppercase tracking-[0.35em]
-                text-gold
-              "
-            >
-              Featured Work
-            </h2>
-          </div>
+          <SectionHeading
+            id="featured-projects-heading"
+            label="Featured Work"
+            accent
+          />
 
           <div className="space-y-12 md:space-y-16 lg:space-y-20">
             {featuredProjects.map((project, index) => (
-              <FeaturedProject
+              <div
                 key={project.id}
-                project={project}
-                index={index}
-              />
+                id={project.slug}
+                className="scroll-mt-32"
+              >
+                <FeaturedProject
+                  project={project}
+                  index={index}
+                />
+              </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Remaining projects */}
-      {remainingProjects.length > 0 && (
+      {projects.length > 0 && (
         <section
-          className={`
-            ${featuredProjects.length > 0 ? "mt-20 md:mt-24 lg:mt-32" : ""}
-          `}
           aria-labelledby="more-projects-heading"
+          className={
+            featuredProjects.length > 0
+              ? 'mt-20 md:mt-24 lg:mt-32'
+              : ''
+          }
         >
-          <div className="reveal mb-8 flex items-center gap-4 sm:mb-10 lg:mb-12">
-            <div className="h-px w-6 shrink-0 bg-stone-pale" />
-
-            <h2
-              id="more-projects-heading"
-              className="
-                text-[10px] font-medium uppercase tracking-[0.35em]
-                text-stone-light
-              "
-            >
-              More Projects
-            </h2>
-          </div>
+          <SectionHeading
+            id="more-projects-heading"
+            label={
+              featuredProjects.length > 0
+                ? 'More Projects'
+                : 'Projects'
+            }
+          />
 
           <div
             className="
@@ -177,12 +73,13 @@ export default function ProjectsGrid() {
               xl:grid-cols-3
             "
           >
-            {remainingProjects.map((project, index) => (
+            {projects.map((project, index) => (
               <div
                 key={project.id}
-                className="reveal-scale"
+                id={project.slug}
+                className="reveal-scale scroll-mt-32"
                 style={{
-                  transitionDelay: `${index * 80}ms`,
+                  transitionDelay: `${Math.min(index, 4) * 70}ms`,
                 }}
               >
                 <ProjectCard project={project} />
@@ -191,30 +88,76 @@ export default function ProjectsGrid() {
           </div>
         </section>
       )}
-
-      {/* Empty state */}
-      {projectCount === 0 && (
-        <div className="reveal py-24 text-center sm:py-28 lg:py-32">
-          <p
-            className="
-              mx-auto max-w-xl
-              font-['Cormorant_Garamond']
-              text-3xl font-light leading-tight text-stone-light
-              sm:text-4xl
-            "
-          >
-            No projects are available in this category yet.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setActiveCategory("All")}
-            className="btn-outline mt-8 justify-center"
-          >
-            <span>View All Projects</span>
-          </button>
-        </div>
-      )}
     </div>
+  );
+}
+
+interface SectionHeadingProps {
+  id: string;
+  label: string;
+  accent?: boolean;
+}
+
+function SectionHeading({
+  id,
+  label,
+  accent = false,
+}: SectionHeadingProps) {
+  return (
+    <div className="reveal mb-8 flex items-center gap-4 sm:mb-10 lg:mb-12">
+      <div
+        aria-hidden="true"
+        className={`h-px w-6 shrink-0 ${
+          accent ? 'bg-gold' : 'bg-stone-pale'
+        }`}
+      />
+
+      <h2
+        id={id}
+        className={`text-[10px] font-medium tracking-[0.35em] uppercase ${
+          accent ? 'text-gold' : 'text-stone-light'
+        }`}
+      >
+        {label}
+      </h2>
+    </div>
+  );
+}
+
+function ProjectsEmptyState() {
+  return (
+    <section
+      aria-labelledby="projects-empty-heading"
+      className="reveal py-20 text-center sm:py-24 lg:py-28"
+    >
+      <p className="text-[10px] font-medium tracking-[0.35em] text-gold uppercase">
+        Project Gallery
+      </p>
+
+      <h2
+        id="projects-empty-heading"
+        className="
+          mx-auto mt-4 max-w-2xl
+          font-['Cormorant_Garamond']
+          text-3xl leading-tight font-light
+          text-stone-darkest
+          sm:text-4xl
+        "
+      >
+        New project stories are being prepared.
+      </h2>
+
+      <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed font-light text-stone sm:text-base">
+        Have a property project in mind? Tell us what you would like to improve,
+        and we can help you plan the next step.
+      </p>
+
+      <Link
+        href="/contact"
+        className="btn-primary mt-8 justify-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:transition-none motion-reduce:before:transition-none"
+      >
+        <span>Discuss Your Project</span>
+      </Link>
+    </section>
   );
 }

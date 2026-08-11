@@ -1,95 +1,150 @@
-'use client';
+import Image from 'next/image';
+import { FiMail, FiPhone } from 'react-icons/fi';
 
-import { useEffect, useRef } from 'react';
+import { getSiteSettings } from '@/features/site-settings/api';
 
-export default function CareersCTA() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.15 }
-    );
-    ref.current?.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+export default async function CareersCTA() {
+  const { email, phone } = await getSiteSettings();
+  const phoneHref = phone
+    ? `tel:${phone.replace(/[^\d+]/g, '')}`
+    : null;
+  const contactMethods = [
+    {
+      label: 'Call Us',
+      value: phone,
+      href: phoneHref,
+      icon: FiPhone,
+    },
+    {
+      label: 'Email Us',
+      value: email,
+      href: email ? `mailto:${email}` : null,
+      icon: FiMail,
+    },
+  ].filter(
+    (
+      method,
+    ): method is {
+      label: string;
+      value: string;
+      href: string;
+      icon: typeof FiPhone;
+    } => Boolean(method.value && method.href),
+  );
 
   return (
-    <section ref={ref} className="relative overflow-hidden bg-[#faf8f5] py-28 lg:py-36">
-      {/* Decorative image panel — right half */}
+    <section
+      aria-labelledby="careers-cta-heading"
+      className="relative overflow-hidden bg-[#faf8f5] py-16 sm:py-20 lg:py-36"
+    >
       <div
-        className="absolute top-0 right-0 bottom-0 w-1/2 hidden lg:block"
-        style={{
-          backgroundImage: `url('/services/Driveway1.jpg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        aria-hidden="true"
+        className="absolute inset-y-0 right-0 hidden w-1/2 bg-[#1a1714] lg:block"
       >
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent to-[#faf8f5]" />
+        <Image
+          src="/services/Driveway1.jpg"
+          alt=""
+          fill
+          sizes="50vw"
+          className="object-cover"
+        />
+
+        <div className="absolute inset-0 bg-linear-to-l from-[#1a1714]/5 via-[#faf8f5]/10 to-[#faf8f5]" />
       </div>
 
-      <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-12">
+      <div className="relative z-10 mx-auto max-w-(--max-content-width) px-6 lg:px-12">
         <div className="lg:w-1/2 lg:pr-16">
           <div className="reveal-left">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-8 h-px bg-[#b8975a]" />
-              <span className="text-[11px] tracking-[0.35em] uppercase text-[#b8975a] font-medium">Ready to Start?</span>
+            <div className="mb-7 flex items-center gap-4 sm:mb-8">
+              <div aria-hidden="true" className="h-px w-8 bg-[#b8975a]" />
+
+              <p className="text-[11px] font-medium tracking-[0.35em] text-[#b8975a] uppercase">
+                Ready to Get Started?
+              </p>
             </div>
 
-            <h2 className="font-['Cormorant_Garamond'] text-[clamp(38px,5vw,68px)] font-light text-[#1a1714] leading-[0.95] mb-8">
-              Come Build<br />
-              <em className="italic text-[#b8975a]">With Us.</em>
+            <h2
+              id="careers-cta-heading"
+              className="mb-7 font-['Cormorant_Garamond'] text-[clamp(2.5rem,5vw,4.25rem)] leading-[0.98] font-light text-[#1a1714] sm:mb-8"
+            >
+              Come Build
+              <br />
+              <em className="text-[#b8975a] italic">With Us.</em>
             </h2>
 
-            <p className="text-[#5c5550] text-base font-light leading-relaxed max-w-md mb-10">
-              A Final CTA goes here with a short description and a little inpiration.
+            <p className="mb-9 max-w-md text-base leading-relaxed font-light text-[#5c5550] sm:mb-10">
+              Explore our current openings and find a place where dependable
+              work, practical skill, and pride in a job well done are valued.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-12">
-              <a href="#positions" className="btn-primary">
-                <span>See All Open Roles</span>
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="relative z-10">
-                  <path d="M6.5 2v9M3 8l3.5 3.5L10 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+              <a href="#positions" className="btn-primary justify-center">
+                <span>View Open Roles</span>
+
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 13 13"
+                  fill="none"
+                  className="relative z-10"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6.5 11V2M3 5l3.5-3.5L10 5"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </a>
-              <a href="mailto:careers@graysonsservices.com" className="btn-outline">
-                <span>Email Your Resume</span>
-              </a>
+
+              {email && (
+                <a
+                  href={`mailto:${email}`}
+                  className="btn-outline justify-center"
+                >
+                  <FiMail
+                    aria-hidden="true"
+                    className="relative z-10 size-3.5"
+                  />
+                  <span>Email Your Resume</span>
+                </a>
+              )}
             </div>
 
-            {/* Contact nudge */}
-            <div className="border-t border-[#e8e2da] pt-8 space-y-4">
-              <p className="text-[11px] tracking-[0.2em] uppercase text-[#a39890] font-medium">Hiring questions?</p>
-              <div className="flex flex-col sm:flex-row gap-5">
-                {[
-                  { label: 'Email HR', value: 'careers@graysonsservices.com', href: 'mailto:careers@graysonsservices.com' },
-                  { label: 'Call Us', value: '(555) 123-4567', href: 'tel:+15551234567' },
-                ].map((c) => (
-                  <a
-                    key={c.label}
-                    href={c.href}
-                    className="group flex items-center gap-3 text-sm text-[#1a1714] hover:text-[#b8975a] transition-colors duration-200"
-                  >
-                    <div className="w-8 h-8 border border-[#e8e2da] group-hover:border-[#b8975a]/40 flex items-center justify-center transition-colors shrink-0">
-                      {c.label === 'Email HR' ? (
-                        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                          <rect x="1.5" y="2.5" width="10" height="8" rx="0.5" stroke="currentColor" strokeWidth="1.2"/>
-                          <path d="M1.5 3.5l5 4 5-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                        </svg>
-                      ) : (
-                        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                          <path d="M2 2.5h2.5l1 2.5-1.5 1a7 7 0 003.5 3.5l1-1.5 2.5 1V11A1 1 0 0110 12C5.6 12 1 7.4 1 3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </div>
-                    <div>
-                      <div className="text-[9px] tracking-[0.2em] uppercase text-[#a39890] group-hover:text-[#b8975a]/60 transition-colors">{c.label}</div>
-                      <div className="font-medium">{c.value}</div>
-                    </div>
-                  </a>
-                ))}
+            {contactMethods.length > 0 && (
+              <div className="mt-8 border-t border-[#1a1714]/10 pt-7">
+                <p className="mb-5 text-sm leading-relaxed font-light text-[#5c5550]">
+                  Questions about joining the team?
+                </p>
+
+                <address className="flex flex-col gap-4 not-italic sm:flex-row sm:flex-wrap sm:gap-x-8">
+                  {contactMethods.map(
+                    ({ label, value, href, icon: Icon }) => (
+                      <a
+                        key={label}
+                        href={href}
+                        className="group flex min-w-0 items-center gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b8975a]"
+                      >
+                        <span className="flex size-9 shrink-0 items-center justify-center border border-[#b8975a]/35 text-[#b8975a] transition-colors group-hover:border-[#b8975a] group-hover:bg-[#b8975a] group-hover:text-white">
+                          <Icon aria-hidden="true" className="size-4" />
+                        </span>
+
+                        <span className="min-w-0">
+                          <span className="block text-[10px] font-medium tracking-[0.18em] text-[#8d837b] uppercase">
+                            {label}
+                          </span>
+                          <span className="mt-0.5 block break-words text-sm text-[#1a1714] transition-colors group-hover:text-[#b8975a]">
+                            {value}
+                          </span>
+                        </span>
+                      </a>
+                    ),
+                  )}
+                </address>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

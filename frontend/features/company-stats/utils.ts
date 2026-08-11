@@ -4,9 +4,9 @@ import type {
 } from './types';
 
 export function createQuickStats(
-  stats: CompanyStats | null
+  stats: CompanyStats | null,
 ): QuickStats | null {
-  if (!stats) {
+  if (stats === null) {
     return null;
   }
 

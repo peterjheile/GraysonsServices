@@ -1,61 +1,72 @@
-import Header from "@/components/layout/Header"
-import Hero from '@/components/pages/home/Hero'
-import MarqueeStrip from '@/components/pages/home/MarqueeStrip';
-import Gallery from '@/components/pages/home/Gallery';
-import Testimonials from '@/components//pages/home/Testimonials';
-import Contact from '@/components/pages/home/Contact';
 import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
+
 import About from '@/components/pages/home/About';
+import Contact from '@/components/pages/home/Contact';
 import Credentials from '@/components/pages/home/Credentials';
+import Gallery from '@/components/pages/home/Gallery';
+import Hero from '@/components/pages/home/Hero';
+import MarqueeStrip from '@/components/pages/home/MarqueeStrip';
+import Testimonials from '@/components/pages/home/Testimonials';
 import Values from '@/components/pages/home/Values';
 
-import { ABOUT_VALUES, ABOUT_US, CRENTIAL_VALUES } from "@/components/pages/home/view-data";
-
-import { createQuickStats } from '@/features/company-stats/utils'
+import {
+  ABOUT_US,
+  ABOUT_VALUES,
+  CREDENTIAL_VALUES,
+} from '@/components/pages/home/constants';
 
 import { getCompanyStats } from '@/features/company-stats/api';
-import { getServiceNames } from '@/features/services/api'
-import { getHomepageProjectImages } from "@/features/projects/api";
-import { getHomepageReviews } from "@/features/reviews/api";
+import { createQuickStats } from '@/features/company-stats/utils';
+import { getHomepageFeaturedProjects } from '@/features/projects/api';
+import { getHomepageReviews } from '@/features/reviews/api';
+import { getServiceNames } from '@/features/services/api';
 
-
-export default async function Home() {
-
-  const companyStats = await getCompanyStats();
-  const projectImages = await getHomepageProjectImages();
-  const serviceNames = await getServiceNames();
-  const testimonials = await getHomepageReviews();
-
+export default async function HomePage() {
+  const [
+    companyStats,
+    featuredProjects,
+    serviceNames,
+    homepageReviews,
+  ] = await Promise.all([
+    getCompanyStats(),
+    getHomepageFeaturedProjects(),
+    getServiceNames(),
+    getHomepageReviews(),
+  ]);
 
   const quickStats = createQuickStats(companyStats);
-  
 
   return (
-    <main className="grain overflow-x-hidden">
+    <div className="grain overflow-x-clip">
       <Header />
-      <Hero quickStats={quickStats} />
 
-      {serviceNames.length > 3 && (
+      <main id="main-content">
+        <Hero quickStats={quickStats} />
+
         <MarqueeStrip services={serviceNames} />
-      )}
 
-      <About
-        about={ABOUT_US}
-        quickStats={quickStats}
-      />
+        <About
+          about={ABOUT_US}
+          quickStats={quickStats}
+        />
 
-      <Values values={ABOUT_VALUES} />
+        <Values values={ABOUT_VALUES} />
 
-      <Credentials credentials={CRENTIAL_VALUES} />
+        <Credentials credentials={CREDENTIAL_VALUES} />
 
-      <Gallery images={projectImages} />
+        {featuredProjects.length > 0 && (
+          <Gallery projects={featuredProjects} />
+        )}
 
-      <Testimonials testimonials={testimonials} />
+        {homepageReviews.length > 0 && (
+          <Testimonials testimonials={homepageReviews} />
+        )}
 
-      <Contact />
+        <Contact />
+      </main>
 
       <Footer />
-    </main>
+    </div>
   );
 }
- 

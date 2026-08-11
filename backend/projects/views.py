@@ -3,154 +3,76 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
 from .models import Project, ProjectImage
-from .serializers import (
-    HomepageProjectImageSerializer,
-    ProjectCardSerializer,
-    ProjectDetailSerializer,
-)
+from .serializers import HomepageFeaturedProjectSerializer, ProjectSerializer
 
 
-class HomepageProjectImageListView(generics.ListAPIView):
-    """
-    Return every image selected for the homepage.
-
-    There is intentionally no hard-coded limit. The admin controls
-    how many images appear using show_on_homepage.
-    """
-
-    serializer_class = HomepageProjectImageSerializer
-    permission_classes = (AllowAny,)
-
-    def get_queryset(self):
-        return (
-            ProjectImage.objects.filter(
-                show_on_homepage=True,
-                project__is_published=True,
-            )
-            .select_related(
-                "project",
-                "project__category",
-            )
-            .order_by(
-                "homepage_order",
-                "id",
-            )
+def published_projects():
+    project_images = ProjectImage.objects.order_by("display_order", "id")
+    return (
+        Project.objects.filter(is_published=True)
+        .select_related("category")
+        .prefetch_related(
+            Prefetch("images", queryset=project_images),
         )
+        .order_by("display_order", "-completion_year", "title")
+    )
 
 
-class ProjectListView(generics.ListAPIView):
-    """
-    Return lightweight project cards for the complete Projects page.
-
-    Optional category filtering:
-    /api/projects/?category=decks
-    """
-
-    serializer_class = ProjectCardSerializer
-    permission_classes = (AllowAny,)
-
-    def get_queryset(self):
-        images = ProjectImage.objects.order_by(
-            "display_order",
-            "id",
-        )
-
-        queryset = (
-            Project.objects.filter(
-                is_published=True,
-            )
-            .select_related("category")
-            .prefetch_related(
-                Prefetch(
-                    "images",
-                    queryset=images,
-                )
-            )
-        )
-
-        category_slug = self.request.query_params.get("category")
-
+class CategoryFilterMixin:
+    def filter_category(self, queryset):
+        category_slug = self.request.query_params.get("category", "").strip()
         if category_slug:
-            queryset = queryset.filter(
-                category__slug=category_slug,
-            )
-
-        return queryset.order_by(
-            "-is_featured",
-            "featured_order",
-            "display_order",
-            "title",
-        )
+            queryset = queryset.filter(category__slug=category_slug)
+        return queryset
 
 
-class FeaturedProjectListView(generics.ListAPIView):
-    """
-    Return complete case-study information for published featured projects.
-
-    Optional category filtering:
-    /api/projects/featured/?category=retaining-walls
-    """
-
-    serializer_class = ProjectDetailSerializer
+class ProjectListView(CategoryFilterMixin, generics.ListAPIView):
+    serializer_class = ProjectSerializer
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        images = ProjectImage.objects.order_by(
-            "display_order",
-            "id",
-        )
+        return self.filter_category(published_projects())
 
-        queryset = (
-            Project.objects.filter(
-                is_published=True,
-                is_featured=True,
-            )
-            .select_related("category")
-            .prefetch_related(
-                Prefetch(
-                    "images",
-                    queryset=images,
-                )
-            )
-        )
 
-        category_slug = self.request.query_params.get("category")
+class FeaturedProjectListView(CategoryFilterMixin, generics.ListAPIView):
+    serializer_class = ProjectSerializer
+    permission_classes = (AllowAny,)
 
-        if category_slug:
-            queryset = queryset.filter(
-                category__slug=category_slug,
-            )
-
-        return queryset.order_by(
-            "featured_order",
-            "title",
+    def get_queryset(self):
+        return self.filter_category(
+            published_projects().filter(is_featured=True)
         )
 
 
 class ProjectDetailView(generics.RetrieveAPIView):
-    """
-    Return one complete published project using its slug.
-    """
-
-    serializer_class = ProjectDetailSerializer
+    serializer_class = ProjectSerializer
     permission_classes = (AllowAny,)
     lookup_field = "slug"
 
     def get_queryset(self):
-        images = ProjectImage.objects.order_by(
-            "display_order",
-            "id",
-        )
+        return published_projects()
 
-        return (
-            Project.objects.filter(
-                is_published=True,
-            )
+
+class HomepageFeaturedProjectListView(
+    CategoryFilterMixin,
+    generics.ListAPIView,
+):
+    serializer_class = HomepageFeaturedProjectSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        queryset = (
+            Project.objects.filter(is_published=True, is_featured=True)
             .select_related("category")
             .prefetch_related(
                 Prefetch(
                     "images",
-                    queryset=images,
-                )
+                    queryset=ProjectImage.objects.order_by(
+                        "display_order",
+                        "id",
+                    ),
+                ),
             )
+            .order_by("display_order", "-completion_year", "title")
         )
+        return self.filter_category(queryset)

@@ -1,5 +1,5 @@
 {
-  "name": "temp",
+  "name": "graysons-services-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,6 +14,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-icons": "^5.6.0",
+    "sharp": "0.35.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {

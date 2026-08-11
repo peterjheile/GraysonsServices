@@ -1,193 +1,120 @@
-'use client';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { useEffect, useRef } from 'react';
+import type { Service } from '@/features/services/types';
 
 interface ServiceBlockProps {
-  id: string;
+  service: Service;
   index: number;
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-  description: string[];
-  features: string[];
-  startingAt?: string;
-  images: string[];
   flip?: boolean;
 }
 
 export default function ServiceBlock({
-  id,
+  service,
   index,
-  eyebrow,
-  title,
-  subtitle,
-  description,
-  features,
-  startingAt,
-  images,
   flip = false,
 }: ServiceBlockProps) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.08 }
-    );
-
-    const els = ref.current?.querySelectorAll(
-      '.reveal, .reveal-left, .reveal-right, .reveal-scale'
-    );
-
-    els?.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
+  const formattedIndex = String(index).padStart(2, '0');
 
   return (
     <article
-      id={id}
-      ref={ref}
-      className="scroll-mt-32 border-b border-stone-pale py-24 last:border-none lg:py-32"
+      id={service.slug}
+      aria-labelledby={`${service.slug}-heading`}
+      className="
+        scroll-mt-31
+        border-b border-stone-pale py-16
+        last:border-none sm:py-20
+        md:scroll-mt-[9.1rem]
+        lg:py-28 xl:py-32
+      "
     >
-      {/* Centered container with max width */}
-      <div className="mx-auto w-full max-w-7xl px-6 lg:px-10">
-        <div
-          className={`flex flex-col items-start gap-12 lg:gap-16 ${
-            flip ? 'lg:flex-row-reverse' : 'lg:flex-row'
-          }`}
-        >
-          {/* ── Image column ── */}
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-10">
+        <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-24">
           <div
-            className={`w-full lg:w-1/2 reveal-${flip ? 'right' : 'left'}`}
+            className={`
+                ${flip ? 'reveal-right lg:order-2' : 'reveal-left'}
+                w-full
+              `}
           >
-            {/* Main image */}
-            <div className="project-card relative mb-3 aspect-4/3 w-full overflow-hidden">
-              <img
-                src={images[0]}
-                alt={title}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-
-              {/* Number badge */}
-              <div className="absolute left-5 top-5 flex h-10 w-10 items-center justify-center bg-gold">
-                <span className="font-['Cormorant_Garamond'] text-lg font-semibold text-stone-darkest">
-                  {String(index).padStart(2, '0')}
-                </span>
-              </div>
-            </div>
-
-            {/* Secondary image strip */}
-            {images.length > 1 && (
-              <div className="grid grid-cols-2 gap-3">
-                {images.slice(1, 3).map((src, i) => (
-                  <div
-                    key={i}
-                    className="project-card relative aspect-3/2 overflow-hidden"
-                  >
-                    <img
-                      src={src}
-                      alt={`${title} ${i + 2}`}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* ── Content column ── */}
-          <div
-            className={`w-full lg:w-1/2 reveal-${flip ? 'left' : 'right'}`}
-          >
-            {/* Eyebrow */}
             <div className="mb-5 flex items-center gap-3">
-              <div className="h-px w-6 bg-gold" />
-              <span className="text-[10px] font-medium uppercase tracking-[0.35em] text-gold">
-                {eyebrow}
-              </span>
+              <span aria-hidden="true" className="h-px w-6 shrink-0 bg-gold" />
+
+              <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gold sm:tracking-[0.35em]">
+                {service.category.name}
+              </p>
             </div>
 
-            {/* Title */}
-            <h2 className="mb-2 font-['Cormorant_Garamond'] text-[clamp(32px,4vw,52px)] font-light leading-tight text-stone-darkest">
-              {title}
+            <h2
+              id={`${service.slug}-heading`}
+              className="font-['Cormorant_Garamond'] text-[clamp(2rem,5vw,3.25rem)] leading-[1.05] font-light text-stone-darkest"
+            >
+              {service.name}
             </h2>
 
-            <p className="mb-8 font-['Cormorant_Garamond'] text-xl font-light italic text-stone-light">
-              {subtitle}
+            <p className="mt-3 max-w-xl font-['Cormorant_Garamond'] text-lg leading-relaxed font-light italic text-stone-light sm:text-xl">
+              {service.subtitle}
             </p>
 
-            {/* Description */}
-            <div className="mb-10 space-y-4">
-              {description.map((para, i) => (
-                <p
-                  key={i}
-                  className="text-sm font-light leading-relaxed text-stone-mid"
-                >
-                  {para}
-                </p>
-              ))}
-            </div>
-
-            {/* Features list */}
-            <div className="mb-10">
-              <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.25em] text-stone-light">
-                What's Included
+            <div className="mt-7 max-w-2xl space-y-6 sm:mt-8">
+              <p className="whitespace-pre-line text-sm leading-7 font-light text-stone-mid sm:text-[15px]">
+                {service.overview}
               </p>
 
-              <ul className="space-y-3">
-                {features.map((f) => (
-                  <li
-                    key={f}
-                    className="flex items-start gap-3 text-sm font-light text-stone-darkest"
-                  >
-                    <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-gold/50">
-                      <svg
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                      >
-                        <path
-                          d="M1.5 4l2 2 3-3"
-                          stroke="#b8975a"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
+              <div>
+                <h3 className="mb-2 text-[10px] font-medium tracking-[0.25em] text-stone-light uppercase">
+                  Our Approach
+                </h3>
 
-                    {f}
-                  </li>
-                ))}
-              </ul>
+                <p className="whitespace-pre-line text-sm leading-7 font-light text-stone-mid sm:text-[15px]">
+                  {service.process_description}
+                </p>
+              </div>
             </div>
 
-            {/* Starting price + CTA */}
-            <div className="flex flex-wrap items-center gap-6">
-              {/* {startingAt && (
-                <div className="border-l-2 border-[#b8975a] pl-4">
-                  <div className="text-[9px] uppercase tracking-[0.25em] text-[#a39890]">
-                    Starting at
-                  </div>
+            {service.included_items.length > 0 && (
+              <div className="mt-8 sm:mt-10">
+                <h3 className="mb-5 text-[10px] font-medium uppercase tracking-[0.25em] text-stone-light">
+                  What&apos;s Included
+                </h3>
 
-                  <div className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#1a1714]">
-                    {startingAt}
-                  </div>
-                </div>
-              )} */}
+                <ul className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                  {service.included_items.map((item, itemIndex) => (
+                    <li
+                      key={`${item.text}-${itemIndex}`}
+                      className="flex items-start gap-3 text-sm leading-6 font-light text-stone-darkest"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-gold/50 text-gold"
+                      >
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                          <path
+                            d="M1.5 4l2 2 3-3"
+                            stroke="currentColor"
+                            strokeWidth="1.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
 
-              <a href="/contact" className="btn-primary">
+                      <span>{item.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="mt-9 sm:mt-10">
+              <Link
+                href={`/contact?service=${encodeURIComponent(service.slug)}`}
+                className="btn-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+                aria-label={`Request a quote for ${service.name}`}
+              >
                 <span>Get a Quote</span>
 
                 <svg
+                  aria-hidden="true"
                   width="13"
                   height="13"
                   viewBox="0 0 13 13"
@@ -202,7 +129,55 @@ export default function ServiceBlock({
                     strokeLinejoin="round"
                   />
                 </svg>
-              </a>
+              </Link>
+            </div>
+          </div>
+
+          <div
+            className={`
+                ${flip ? 'reveal-left lg:order-1' : 'reveal-right'}
+                w-full
+              `}
+          >
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="project-card relative col-span-2 aspect-4/3 overflow-hidden bg-stone-pale">
+                <Image
+                  src={service.primary_image}
+                  alt={service.primary_image_alt}
+                  fill
+                  sizes="(min-width: 1280px) 560px, (min-width: 1024px) 45vw, calc(100vw - 40px)"
+                  className="object-cover motion-reduce:transform-none! motion-reduce:transition-none!"
+                />
+
+                <div
+                  aria-hidden="true"
+                  className="absolute top-4 left-4 flex h-10 w-10 items-center justify-center bg-gold shadow-sm sm:top-5 sm:left-5"
+                >
+                  <span className="font-['Cormorant_Garamond'] text-lg font-semibold text-stone-darkest">
+                    {formattedIndex}
+                  </span>
+                </div>
+              </div>
+
+              <div className="project-card relative aspect-4/3 overflow-hidden bg-stone-pale">
+                <Image
+                  src={service.supporting_image_one}
+                  alt={service.supporting_image_one_alt}
+                  fill
+                  sizes="(min-width: 1280px) 272px, (min-width: 1024px) 22vw, calc(50vw - 26px)"
+                  className="object-cover motion-reduce:transform-none! motion-reduce:transition-none!"
+                />
+              </div>
+
+              <div className="project-card relative aspect-4/3 overflow-hidden bg-stone-pale">
+                <Image
+                  src={service.supporting_image_two}
+                  alt={service.supporting_image_two_alt}
+                  fill
+                  sizes="(min-width: 1280px) 272px, (min-width: 1024px) 22vw, calc(50vw - 26px)"
+                  className="object-cover motion-reduce:transform-none! motion-reduce:transition-none!"
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -4,61 +4,60 @@ import {
   FiShield,
   FiTool,
 } from 'react-icons/fi';
+import type { IconType } from 'react-icons';
 
-import RevealObserver from './RevealObserverClient';
-import type { ValueCard } from './view-types';
+import type { ValueCard } from './types';
 
-const ICONS = {
+const VALUE_ICONS = {
   craftsmanship: FiTool,
   communication: FiMessageCircle,
   commitment: FiAward,
   dependable: FiShield,
-};
+} satisfies Record<ValueCard['icon'], IconType>;
 
 type ValuesProps = {
-  values: [ValueCard, ValueCard, ValueCard, ValueCard];
+  values: readonly ValueCard[];
 };
 
 export default function Values({ values }: ValuesProps) {
+  if (values.length === 0) {
+    return null;
+  }
+
   return (
-    <RevealObserver>
-      <section id="values" className="bg-white">
-        <div className="mx-auto max-w-(--max-content-width) px-6 lg:px-12">
-          <div className="py-28">
-            <div className="reveal mb-16 text-center">
-              <span className="text-[11px] font-medium tracking-[0.35em] text-gold uppercase">
-                What Defines Us
-              </span>
+    <section
+      id="values"
+      aria-labelledby="values-heading"
+      className="scroll-mt-24 bg-white"
+    >
+      <div className="mx-auto max-w-(--max-content-width) px-6 lg:px-12">
+        <div className="py-24 lg:py-28">
+          <header className="reveal mb-12 text-center sm:mb-16">
+            <p className="text-[11px] font-medium tracking-[0.35em] text-gold uppercase">
+              What Defines Us
+            </p>
 
-              <h2 className="mt-3 font-['Cormorant_Garamond'] text-[clamp(34px,4vw,52px)] font-light text-stone-darkest">
-                The Values Behind Our Work
-              </h2>
-            </div>
+            <h2
+              id="values-heading"
+              className="mt-3 text-balance font-['Cormorant_Garamond'] text-[clamp(34px,4vw,52px)] font-light text-stone-darkest"
+            >
+              The Values Behind Our Work
+            </h2>
+          </header>
 
-            <div className="grid overflow-hidden border border-gold/20 sm:grid-cols-2 lg:grid-cols-4">
-              {values.map((value, index) => {
-                const Icon = ICONS[value.icon];
+          <div className="grid gap-px border border-gold/20 bg-gold/20 sm:grid-cols-2 lg:grid-cols-4">
+            {values.map((value, index) => {
+              const Icon = VALUE_ICONS[value.icon];
 
-                return (
-                  <article
-                    key={value.title}
-                    className={`
-                      group reveal p-8 text-center
-                      transition-colors duration-500 hover:bg-stone-darkest
-                      lg:border-r lg:p-10 lg:last:border-r-0
-                      ${index < 3 ? 'border-b border-gold/20' : ''}
-                      ${
-                        index < 2
-                          ? 'sm:border-b sm:border-gold/20'
-                          : 'sm:border-b-0'
-                      }
-                      ${index % 2 === 0 ? 'sm:border-r sm:border-gold/20' : ''}
-                      lg:border-b-0
-                    `}
-                    style={{
-                      transitionDelay: `${index * 80}ms`,
-                    }}
-                  >
+              return (
+                <div
+                  key={value.title}
+                  className="reveal h-full"
+                  style={{
+                    transitionDelay: `${index * 80}ms`,
+                  }}
+                >
+                  <article className="group h-full bg-white p-8 text-center transition-colors duration-500 hover:bg-stone-darkest lg:p-10">
                     <div className="mb-6 flex justify-center">
                       <Icon
                         aria-hidden="true"
@@ -66,22 +65,22 @@ export default function Values({ values }: ValuesProps) {
                       />
                     </div>
 
-                    <h3 className="mb-3 font-['Cormorant_Garamond'] text-xl font-semibold text-stone-darkest transition-colors group-hover:text-white">
+                    <h3 className="mb-3 font-['Cormorant_Garamond'] text-xl font-semibold text-stone-darkest transition-colors duration-500 group-hover:text-white">
                       {value.title}
                     </h3>
 
-                    <p className="text-sm leading-relaxed font-light text-stone-mid transition-colors group-hover:text-stone-light">
+                    <p className="text-sm leading-relaxed font-light text-stone-mid transition-colors duration-500 group-hover:text-stone-light">
                       {value.body}
                     </p>
                   </article>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
-
-          <div aria-hidden="true" className="section-rule" />
         </div>
-      </section>
-    </RevealObserver>
+
+        <div aria-hidden="true" className="section-rule" />
+      </div>
+    </section>
   );
 }

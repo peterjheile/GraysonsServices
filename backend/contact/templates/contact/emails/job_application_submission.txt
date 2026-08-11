@@ -1,0 +1,36 @@
+A new job application has been received.
+
+POSITION
+
+Role: {{ job_posting.title }}
+Category: {{ job_posting.category.name }}
+Location: {{ job_posting.location }}
+Employment type: {{ job_posting.get_employment_type_display }}
+Pay range: {{ pay_range_label }}
+
+APPLICANT
+
+Name: {{ full_name }}
+Email: {{ application.email }}
+Phone: {{ application.phone }}
+City / Town: {{ application.city|default:"Not provided" }}
+
+APPLICATION DETAILS
+
+Experience: {{ application.get_years_experience_display }}
+Availability: {{ application.get_availability_display }}
+Pay range response: {{ application.get_pay_range_response_display }}
+
+WHY THEY WANT TO WORK AT GRAYSON'S
+
+{{ application.motivation }}
+
+RESUME
+
+{% if resume_uploaded %}A resume was uploaded privately. Open this application in Django admin to download it.{% else %}No resume was uploaded.{% endif %}
+
+SUBMITTED
+
+{{ submitted_at|date:"F j, Y \a\t g:i A" }}
+
+Reply directly to this email to respond to {{ application.first_name }}.

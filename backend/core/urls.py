@@ -1,9 +1,15 @@
 from django.urls import path
 
-from .views import SiteSettingsView, CompanyStatsView
+from .health import healthcheck
+from .views import CompanyStatsView, SiteSettingsView
 
 
 urlpatterns = [
+    path(
+        "health/",
+        healthcheck,
+        name="healthcheck",
+    ),
     path(
         "site-settings/",
         SiteSettingsView.as_view(),
