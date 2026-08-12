@@ -370,7 +370,7 @@ export async function submitJobApplication(
   }
 
   return submitToApi(
-    '/api/careers/applications/',
+    '/api/contact/careers/applications/',
     {
       method: 'POST',
       body: formData,
