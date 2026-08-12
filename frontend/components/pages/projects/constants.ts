@@ -1,7 +1,7 @@
 import type { ProjectsHeroContent } from './types';
 
 export const PROJECTS_HERO = {
-  imageUrl: '/images/defaults/projects/hero.jpg',
+  imageUrl: '/images/defaults/projects/hero.webp',
   backgroundPosition: 'center 45%',
   eyebrow: 'Selected Projects',
   title: 'Our',

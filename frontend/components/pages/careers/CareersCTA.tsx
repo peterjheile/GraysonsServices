@@ -42,7 +42,7 @@ export default async function CareersCTA() {
         className="absolute inset-y-0 right-0 hidden w-1/2 bg-[#1a1714] lg:block"
       >
         <Image
-          src="/services/Driveway1.jpg"
+          src='/images/defaults/careers/about.webp'
           alt=""
           fill
           sizes="50vw"

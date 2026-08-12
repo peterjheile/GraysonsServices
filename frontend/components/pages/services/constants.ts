@@ -5,7 +5,7 @@ import type {
 } from './types';
 
 export const SERVICES_HERO = {
-  imageUrl: '/images/defaults/services/hero.jpg',
+  imageUrl: '/images/defaults/services/hero.webp',
   backgroundPosition: 'center',
   eyebrow: 'Services',
   title: 'Practical Work,',

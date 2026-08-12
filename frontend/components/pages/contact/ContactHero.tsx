@@ -3,7 +3,7 @@ import PageHero from '@/components/ui/page-hero';
 export default function ContactHero() {
   return (
     <PageHero
-      imageUrl="/images/defaults/contact/hero.jpg"
+      imageUrl="/images/defaults/contact/hero.webp"
       backgroundPosition="center 35%"
       eyebrow="Contact Us"
       titleNorm="Let’s Start"

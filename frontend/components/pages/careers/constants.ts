@@ -1,5 +1,5 @@
 export const CAREERS_HERO = {
-  imageUrl: '/images/defaults/careers/hero.jpg',
+  imageUrl: '/images/defaults/careers/hero.webp',
   backgroundPosition: 'center 40%',
   eyebrow: 'Join the Crew',
   title: 'Build Something',
@@ -11,7 +11,7 @@ export const CAREERS_HERO = {
 
 export const CULTURE_CONTENT = {
   image: {
-    src: '/images/defaults/careers/culture.jpeg',
+    src: '/images/defaults/careers/culture.webp',
     alt: "Grayson's Services team member at work",
   },
   card: {
@@ -29,8 +29,8 @@ export const CULTURE_CONTENT = {
 } as const;
 
 export const CULTURE_IMAGES = [
-  '/services/d8.jpg',
-  '/services/RetainingWall1.jpg',
-  '/services/RetainingWall2.jpg',
-  '/services/Walkway1.jpg',
+  '/images/defaults/careers/strip1.webp',
+  '/images/defaults/careers/strip2.webp',
+  '/images/defaults/careers/strip3.webp',
+  '/images/defaults/careers/strip4.webp',
 ] as const;

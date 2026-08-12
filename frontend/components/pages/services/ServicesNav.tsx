@@ -16,6 +16,8 @@ interface ServicesNavProps {
   services: readonly ServiceName[];
 }
 
+const SERVICE_ACTIVATION_OFFSET = 32;
+
 export default function ServicesNav({ services }: ServicesNavProps) {
   const [activeSlug, setActiveSlug] = useState(services[0]?.slug ?? '');
 
@@ -36,7 +38,8 @@ export default function ServicesNav({ services }: ServicesNavProps) {
       return;
     }
 
-    const activationLine = navRef.current.getBoundingClientRect().bottom + 1;
+  const activationLine =
+    navRef.current.getBoundingClientRect().bottom + SERVICE_ACTIVATION_OFFSET;
 
     let nextSlug = sections[0].id;
 

@@ -20,7 +20,7 @@ export default function Hero({ quickStats }: HeroProps) {
     <section className="relative isolate flex h-svh min-h-175 max-h-275 w-full items-end overflow-hidden bg-stone-darkest">
       {/* Background */}
       <ParallaxHero
-        imageUrl="/images/defaults/home/hero.jpg"
+        imageUrl="/images/defaults/home/hero.webp"
         backgroundPosition="center 40%"
       />
 

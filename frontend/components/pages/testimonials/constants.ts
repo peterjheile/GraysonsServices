@@ -1,7 +1,7 @@
 import type { TestimonialsHeroContent } from './types';
 
 export const TESTIMONIALS_HERO = {
-  imageUrl: '/images/defaults/testimonials/hero.jpg',
+  imageUrl: '/images/defaults/testimonials/hero.webp',
   backgroundPosition: 'center 40%',
   eyebrow: 'Client Testimonials',
   title: 'Words From',
