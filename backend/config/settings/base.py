@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from decouple import AutoConfig
+from django.templatetags.static import static
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -123,6 +124,9 @@ STATIC_ROOT = _path_setting(
     "STATIC_ROOT",
     BASE_DIR / "staticfiles",
 )
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = _path_setting(
@@ -157,9 +161,60 @@ REST_FRAMEWORK = {
 
 
 UNFOLD = {
-    "SITE_TITLE": "Website Administration",
-    "SITE_HEADER": "Website Administration",
-    "SITE_SYMBOL": "settings",
+    # Keep your existing Unfold settings...
+
+    "SITE_TITLE": "Grayson’s Services Administration",
+    "SITE_HEADER": "Grayson’s Services",
+    "SITE_SUBHEADER": "Website Administration",
+    "SITE_URL": "https://graysonsservices.com",
+
+    "SITE_LOGO": lambda request: static(
+        "admin-branding/logo.png"
+    ),
+    "SITE_ICON": lambda request: static(
+        "admin-branding/icon.png"
+    ),
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "type": "image/png",
+            "href": lambda request: static(
+                "admin-branding/favicon.png"
+            ),
+        },
+    ],
+
+    "COLORS": {
+        "base": {
+            "50": "#fafaf9",
+            "100": "#f5f5f4",
+            "200": "#e7e5e4",
+            "300": "#d6d3d1",
+            "400": "#a8a29e",
+            "500": "#78716c",
+            "600": "#57534e",
+            "700": "#44403c",
+            "800": "#292524",
+            "900": "#1c1917",
+            "950": "#0c0a09",
+        },
+        "primary": {
+            "50": "#faf8f3",
+            "100": "#f4efe3",
+            "200": "#e9ddc5",
+            "300": "#dcc79f",
+            "400": "#c9aa73",
+            "500": "#b8975a",
+            "600": "#967641",
+            "700": "#765c35",
+            "800": "#604b30",
+            "900": "#513f2b",
+            "950": "#2d2116",
+        },
+    },
+
+    "BORDER_RADIUS": "4px",
 }
 
 
