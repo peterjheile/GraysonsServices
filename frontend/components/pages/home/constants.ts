@@ -15,7 +15,7 @@ export const ABOUT_US = {
     `We believe great work comes from quality craftsmanship, honest communication, and careful attention to detail. From the first conversation to the final walkthrough, we keep expectations clear, respect your property, and never cut corners where lasting quality matters.`,
     `As we continue to grow, our commitment remains the same: dependable service, durable results, and a finished project you can enjoy with confidence for years to come.`,
   ],
-  url: '/images/defaults/home/about.jpg',
+  url: '/images/defaults/home/about.webp',
 } as const satisfies AboutUs;
 
 export const ABOUT_VALUES = [
