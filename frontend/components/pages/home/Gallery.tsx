@@ -9,8 +9,6 @@ import type {
   HomepageProjectSize,
 } from '@/features/projects/types';
 
-import RevealObserverClient from '../../ui/reveal-observer-client';
-
 type GalleryProps = {
   projects: HomepageFeaturedProject[];
 };
@@ -39,44 +37,43 @@ export default function Gallery({
   }
 
   return (
-    <RevealObserverClient>
-      <section
-        id="gallery"
-        className="bg-stone-darkest py-20 lg:py-30"
-      >
-        <div className="mx-auto max-w-(--max-content-width) px-6 lg:px-12">
-          <div className="reveal mb-10 lg:mb-14">
-            <span className="text-[11px] font-medium uppercase tracking-[0.35em] text-gold">
-              Our Work
-            </span>
+    <section
+      id="gallery"
+      className="bg-stone-darkest py-20 lg:py-30"
+    >
+      <div className="mx-auto max-w-(--max-content-width) px-6 lg:px-12">
+        <div className="reveal mb-10 lg:mb-14">
+          <span className="text-[11px] font-medium uppercase tracking-[0.35em] text-gold">
+            Our Work
+          </span>
 
-            <h2 className="mt-3 font-['Cormorant_Garamond'] text-[clamp(36px,4.5vw,60px)] leading-tight font-light text-white">
-              Featured Projects
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:auto-rows-[280px] lg:grid-flow-dense lg:grid-cols-3">
-            {visibleProjects.map((project, index) => (
-              <ProjectCard
-                key={project.slug}
-                project={project}
-                index={index}
-              />
-            ))}
-          </div>
-
-          <div className="reveal mt-14 text-center lg:mt-16">
-            <Link
-              href="/projects"
-              className="btn-outline text-gold"
-              style={{ borderColor: '#b8975a' }}
-            >
-              <span>Explore All Projects</span>
-            </Link>
-          </div>
+          <h2 className="mt-3 font-['Cormorant_Garamond'] text-[clamp(36px,4.5vw,60px)] leading-tight font-light text-white">
+            Featured Projects
+          </h2>
         </div>
-      </section>
-    </RevealObserverClient>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:auto-rows-[280px] lg:grid-flow-dense lg:grid-cols-3">
+          {visibleProjects.map((project, index) => (
+            <ProjectCard
+              key={project.slug}
+              project={project}
+              index={index}
+            />
+          ))}
+        </div>
+
+        <div className="reveal mt-14 text-center lg:mt-16">
+          <Link
+            href="/projects"
+            className="btn-outline group border-gold text-gold"
+          >
+            <span className="transition-colors duration-300 group-hover:text-stone-darkest">
+              Explore All Projects
+            </span>
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
 
