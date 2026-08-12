@@ -88,6 +88,7 @@ def _send_job_application_emails(application):
 class ContactSubmissionCreateView(CreateAPIView):
     queryset = ContactSubmission.objects.all()
     serializer_class = ContactSubmissionSerializer
+    authentication_classes = ()
     permission_classes = (AllowAny,)
     throttle_classes = (
         ContactSubmissionBurstThrottle,
@@ -106,6 +107,7 @@ class ContactSubmissionCreateView(CreateAPIView):
 class QuoteRequestCreateView(CreateAPIView):
     queryset = QuoteRequest.objects.all()
     serializer_class = QuoteRequestSerializer
+    authentication_classes = ()
     permission_classes = (AllowAny,)
     throttle_classes = (
         QuoteRequestBurstThrottle,
@@ -125,6 +127,7 @@ class QuoteRequestCreateView(CreateAPIView):
 class JobApplicationCreateView(CreateAPIView):
     queryset = JobApplication.objects.all()
     serializer_class = JobApplicationSerializer
+    authentication_classes = ()
     permission_classes = (AllowAny,)
     throttle_classes = (
         JobApplicationBurstThrottle,
