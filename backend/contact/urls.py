@@ -18,12 +18,12 @@ urlpatterns = [
         name="contact-submission-create",
     ),
     path(
-        "quote-request/",
+        "contact/quote-request/",
         QuoteRequestCreateView.as_view(),
         name="quote-request-create",
     ),
     path(
-        "careers/applications/",
+        "contact/careers/applications/",
         JobApplicationCreateView.as_view(),
         name="job-application-create",
     ),
