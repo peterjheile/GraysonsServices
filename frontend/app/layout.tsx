@@ -24,6 +24,7 @@ const cormorantGaramond = Cormorant_Garamond({
   subsets: ['latin'],
   style: ['normal', 'italic'],
   display: 'swap',
+  preload: false,
   variable: '--font-cormorant-garamond',
 });
 
@@ -43,6 +44,7 @@ export default function RootLayout({
         ${dmSans.variable}
         ${cormorantGaramond.variable}
       `}
+      data-scroll-behavior="smooth"
     >
       <body className="font-sans antialiased">
         <RevealObserver />
