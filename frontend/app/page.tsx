@@ -53,7 +53,8 @@ export default async function HomePage() {
 
         <Values values={ABOUT_VALUES} />
 
-        <Credentials credentials={CREDENTIAL_VALUES} />
+        {/* Removed until Client Provides or Aquires Reasonble Credentials */}
+        {/* <Credentials credentials={CREDENTIAL_VALUES} /> */}
 
         {featuredProjects.length > 0 && (
           <Gallery projects={featuredProjects} />

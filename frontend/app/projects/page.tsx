@@ -10,7 +10,6 @@ import {
   getFeaturedProjects,
   getProjects,
 } from '@/features/projects/api';
-import TransformationStrip from '@/components/pages/projects/TransformationStrip';
 
 export const metadata: Metadata = {
   title: "Projects | Grayson's Services",
